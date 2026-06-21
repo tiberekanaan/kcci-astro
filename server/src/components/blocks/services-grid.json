@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_services_grids",
+  "info": {
+    "displayName": "Services Grid",
+    "icon": "grid"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "services": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.service-item"
+    }
+  }
+}

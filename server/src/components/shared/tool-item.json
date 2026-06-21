@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_shared_tool_items",
+  "info": {
+    "displayName": "Tool Item",
+    "icon": "wrench"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}
