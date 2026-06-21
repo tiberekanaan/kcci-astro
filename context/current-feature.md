@@ -1,13 +1,13 @@
-#### Current Feature
+###### Current Feature
+**Feature:** None — awaiting next feature.
 
-**Feature:** Strapi 5 Backend Initialization
+###### Status
+Idle.
 
-**Branch:** `feature/init-strapi-backend`
+###### Goals
+* TBD.
 
-**Goal:** Scaffold the Strapi 5 application in a `server` directory using SQLite as the database client.
-
-#### Status
-
-In Progress — scaffolding the Strapi 5 app.
-
-#### History
+###### History
+* KCCI Content Framework Schemas completed.
+* Strapi 5 Backend Initialization completed.
+* Repo initialized and context files added.
