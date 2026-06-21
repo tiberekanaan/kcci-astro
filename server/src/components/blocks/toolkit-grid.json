@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_blocks_toolkit_grids",
+  "info": {
+    "displayName": "Toolkit Grid",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "tools": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.tool-item"
+    },
+    "ctaButton": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.button"
+    }
+  }
+}
