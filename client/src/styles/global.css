@@ -4,8 +4,12 @@
   /* Semantic OKLCH color tokens */
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.21 0.006 285.885);
-  --color-primary: oklch(0.55 0.18 264);
   --color-muted: oklch(0.967 0.001 286.375);
+  --color-muted-foreground: oklch(0.55 0.012 285.885);
+
+  /* Brand green (matches BLP / Business Link palette) */
+  --color-primary: oklch(0.62 0.13 150);
+  --color-primary-dark: oklch(0.52 0.12 150);
 
   /* Typography */
   --font-sans: system-ui, sans-serif;

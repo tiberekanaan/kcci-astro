@@ -1,16 +1,14 @@
 ###### Current Feature
-**Feature:** Astro UI and Page Generation
+**Feature:** None — awaiting next feature.
 
 ###### Status
-In Progress — branch feature/astro-ui-pages. Building the frontend pages using the Strapi Content Layer data.
+Idle.
 
 ###### Goals
-* Fetch and display `events`, `faqs`, and `executiveMembers` collections on the frontend.
-* Build the `src/pages/index.astro` homepage.
-* Build dynamic routing for individual event pages (`src/pages/events/[slug].astro`
-
+* TBD.
 
 ###### History
+* Astro UI and Page Generation completed.
 * Astro Strapi Content Layer Integration completed.
 * Astro 6 Frontend Initialization completed.
 * KCCI Content Framework Schemas completed.

@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = (async () => {
+	const events = await getCollection('events');
+
+	return events.map((event) => ({
+		params: { slug: event.data.slug },
+		props: { event },
+	}));
+}) satisfies GetStaticPaths;
+
+const { event } = Astro.props;
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+	dateStyle: 'long',
+});
+---
+
+<Layout title={event.data.title}>
+	<main class="mx-auto max-w-3xl px-6 py-12 space-y-6">
+		<a href="/" class="text-sm text-primary hover:underline">&larr; Back to home</a>
+
+		<header class="space-y-2">
+			<h1 class="text-3xl font-bold text-primary">{event.data.title}</h1>
+			<div class="space-y-1 text-foreground/70">
+				{
+					event.data.date && (
+						<p>{dateFormatter.format(new Date(event.data.date))}</p>
+					)
+				}
+				{event.data.location && <p>{event.data.location}</p>}
+			</div>
+		</header>
+
+		{
+			event.data.description && (
+				<div class="prose max-w-none" set:html={event.data.description} />
+			)
+		}
+	</main>
+</Layout>
