@@ -76,12 +76,19 @@ export interface CtaBlock {
 	button?: SharedButton | null;
 }
 
+export interface RichTextBlock {
+	__component: 'blocks.rich-text';
+	id: number;
+	body: string | null;
+}
+
 export type Block =
 	| HeroBlock
 	| AboutSectionBlock
 	| ServicesGridBlock
 	| ToolkitGridBlock
-	| CtaBlock;
+	| CtaBlock
+	| RichTextBlock;
 
 export interface GlobalData {
 	siteName: string | null;

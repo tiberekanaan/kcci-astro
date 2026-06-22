@@ -1,11 +1,11 @@
 {
-  "kind": "singleType",
-  "collectionName": "homepages",
+  "kind": "collectionType",
+  "collectionName": "pages",
   "info": {
-    "singularName": "homepage",
-    "pluralName": "homepages",
-    "displayName": "Homepage",
-    "description": "The KCCI landing page composed of dynamic content blocks."
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page",
+    "description": "Generic content page composed of dynamic content blocks."
   },
   "options": {
     "draftAndPublish": true
@@ -13,7 +13,12 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
     },
     "content": {
       "type": "dynamiczone",
