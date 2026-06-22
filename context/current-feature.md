@@ -1,16 +1,17 @@
 ###### Current Feature
-**Feature:** Astro UI and Page Generation
+**Feature:** Dynamic Homepage & Global Layout Wiring
 
 ###### Status
-In Progress — branch feature/astro-ui-pages. Building the frontend pages using the Strapi Content Layer data.
+In Progress — branch feature/dynamic-homepage. Wiring up the Astro static components to Strapi Single Types.
 
 ###### Goals
-* Fetch and display `events`, `faqs`, and `executiveMembers` collections on the frontend.
-* Build the `src/pages/index.astro` homepage.
-* Build dynamic routing for individual event pages (`src/pages/events/[slug].astro`
-
+* Create a `global` Single Type in Strapi for the editable Header and Footer navigation.
+* Fetch the `homepage` Single Type using native fetch (SSR with `prerender = false`) and populate the dynamic zone.
+* Create a `BlockRenderer.astro` component to dynamically map Strapi components (`blocks.hero`, `blocks.about`, etc.) to the UI.
+* Fetch the `global` Single Type in `Layout.astro` to populate the global Header and Footer.
 
 ###### History
+* Astro UI and Page Generation completed.
 * Astro Strapi Content Layer Integration completed.
 * Astro 6 Frontend Initialization completed.
 * KCCI Content Framework Schemas completed.
