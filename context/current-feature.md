@@ -1,17 +1,17 @@
 ###### Current Feature
-**Feature:** Astro Strapi Content Layer Integration
+**Feature:** Astro UI and Page Generation
 
 ###### Status
-In Progress — branch feature/astro-strapi-integration. Connecting Astro to Strapi using the Content Loader API.
+In Progress — branch feature/astro-ui-pages. Building the frontend pages using the Strapi Content Layer data.
 
 ###### Goals
-* Install `strapi-community-astro-loader` in the `client` directory.
-* Set up `client/.env` with the local Strapi URL.
-* Create `client/src/content.config.ts` utilizing `astro:content` and `astro:zod`.
-* Define Zod schemas and fetch `events`, `faqs`, and `executiveMembers` collections.
+* Fetch and display `events`, `faqs`, and `executiveMembers` collections on the frontend.
+* Build the `src/pages/index.astro` homepage.
+* Build dynamic routing for individual event pages (`src/pages/events/[slug].astro`
 
 
 ###### History
+* Astro Strapi Content Layer Integration completed.
 * Astro 6 Frontend Initialization completed.
 * KCCI Content Framework Schemas completed.
 * Strapi 5 Backend Initialization completed.
