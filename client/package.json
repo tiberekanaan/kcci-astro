@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^10.1.4",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.7",
     "strapi-community-astro-loader": "^4.0.0",

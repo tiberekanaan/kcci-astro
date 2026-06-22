@@ -1,0 +1,45 @@
+---
+import type { SharedLink } from '../types/blocks';
+
+interface Props {
+	siteName?: string | null;
+	footerLinks?: SharedLink[] | null;
+}
+
+const { siteName = 'KCCI Business Link', footerLinks } = Astro.props;
+
+const links = footerLinks ?? [];
+---
+
+<footer id="contact" class="bg-neutral-900 text-neutral-300">
+	<div class="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 md:grid-cols-3">
+		<div class="space-y-3">
+			<div class="flex items-center gap-2.5 font-bold text-white">
+				<span class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm shadow-sm">K</span>
+				<span>{siteName}</span>
+			</div>
+			<p class="text-sm text-neutral-400">
+				Representing and empowering the private sector to compete, grow and thrive.
+			</p>
+		</div>
+		{
+			links.length > 0 && (
+				<div class="md:col-span-2">
+					<h3 class="mb-3 text-sm font-semibold text-white">Explore</h3>
+					<ul class="grid gap-2 text-sm text-neutral-400 sm:grid-cols-2">
+						{links.map((item) => (
+							<li>
+								<a href={item.url ?? '#'} class="transition-colors hover:text-accent">
+									{item.label}
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			)
+		}
+	</div>
+	<div class="border-t border-neutral-800 py-6 text-center text-xs text-neutral-500">
+		© {new Date().getFullYear()} {siteName}. All rights reserved.
+	</div>
+</footer>

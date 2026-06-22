@@ -1,0 +1,34 @@
+---
+import type { Block } from '../types/blocks';
+import Hero from './blocks/Hero.astro';
+import AboutSection from './blocks/AboutSection.astro';
+import ServicesGrid from './blocks/ServicesGrid.astro';
+import ToolkitGrid from './blocks/ToolkitGrid.astro';
+import Cta from './blocks/Cta.astro';
+
+interface Props {
+	block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+{
+	(() => {
+		switch (block.__component) {
+			case 'blocks.hero':
+				return <Hero {...block} />;
+			case 'blocks.about-section':
+				return <AboutSection {...block} />;
+			case 'blocks.services-grid':
+				return <ServicesGrid {...block} />;
+			case 'blocks.toolkit-grid':
+				return <ToolkitGrid {...block} />;
+			case 'blocks.cta':
+				return <Cta {...block} />;
+			default:
+				// Unknown block types are skipped rather than breaking the page.
+				return null;
+		}
+	})()
+}

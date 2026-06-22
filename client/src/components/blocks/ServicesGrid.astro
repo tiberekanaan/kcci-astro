@@ -1,0 +1,41 @@
+---
+import type { ServicesGridBlock } from '../../types/blocks';
+
+type Props = ServicesGridBlock;
+
+const { title, services } = Astro.props;
+
+const serviceList = services ?? [];
+---
+
+<section id="what-we-do" class="bg-sand/60 py-20">
+	<div class="mx-auto max-w-6xl px-6">
+		{title && <h2 data-reveal class="mb-12 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+		<div class="grid gap-6 md:grid-cols-3">
+			{
+				serviceList.map((service, i) => (
+					<article
+						data-reveal
+						style={`--reveal-delay: ${i * 110}ms`}
+						class="group relative flex flex-col overflow-hidden rounded-2xl border border-muted bg-background p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+					>
+						<span class="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gradient-to-r from-primary to-accent transition-transform duration-300 group-hover:scale-x-100" />
+						<span class="bg-gradient-to-br from-primary to-accent bg-clip-text text-4xl font-bold text-transparent">
+							{String(i + 1).padStart(2, '0')}
+						</span>
+						<h3 class="mt-4 text-lg font-semibold">{service.title}</h3>
+						{service.description && <p class="mt-2 flex-1 text-sm text-muted-foreground">{service.description}</p>}
+						{
+							service.bulletPoints && (
+								<div
+									class="prose prose-sm mt-4 max-w-none border-t border-muted pt-4 text-sm font-medium text-primary"
+									set:html={service.bulletPoints}
+								/>
+							)
+						}
+					</article>
+				))
+			}
+		</div>
+	</div>
+</section>

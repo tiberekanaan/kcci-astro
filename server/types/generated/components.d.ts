@@ -79,6 +79,18 @@ export interface SharedButton extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedLink extends Struct.ComponentSchema {
+  collectionName: 'components_shared_links';
+  info: {
+    displayName: 'Link';
+    icon: 'link';
+  };
+  attributes: {
+    label: Schema.Attribute.String;
+    url: Schema.Attribute.String;
+  };
+}
+
 export interface SharedServiceItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_service_items';
   info: {
@@ -113,6 +125,7 @@ declare module '@strapi/strapi' {
       'blocks.services-grid': BlocksServicesGrid;
       'blocks.toolkit-grid': BlocksToolkitGrid;
       'shared.button': SharedButton;
+      'shared.link': SharedLink;
       'shared.service-item': SharedServiceItem;
       'shared.tool-item': SharedToolItem;
     }

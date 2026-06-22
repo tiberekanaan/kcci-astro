@@ -1,0 +1,29 @@
+---
+import type { AboutSectionBlock } from '../../types/blocks';
+
+type Props = AboutSectionBlock;
+
+const { whoWeAre, vision, mission } = Astro.props;
+
+const rows = [
+	{ title: 'Who We Are', body: whoWeAre },
+	{ title: 'Our Vision', body: vision },
+	{ title: 'Our Mission', body: mission },
+].filter((row) => row.body);
+---
+
+<section id="about" class="mx-auto max-w-5xl px-6 py-20">
+	<div class="divide-y divide-muted">
+		{
+			rows.map((row, i) => (
+				<div data-reveal style={`--reveal-delay: ${i * 90}ms`} class="group grid gap-4 py-8 md:grid-cols-3 md:gap-10">
+					<h2 class="flex items-center gap-3 text-xl font-semibold">
+						<span class="h-5 w-1 rounded-full bg-gradient-to-b from-primary to-accent transition-all duration-300 group-hover:h-7" />
+						{row.title}
+					</h2>
+					<div class="prose max-w-none text-muted-foreground md:col-span-2" set:html={row.body} />
+				</div>
+			))
+		}
+	</div>
+</section>
