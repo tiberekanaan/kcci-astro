@@ -1,16 +1,15 @@
 ###### Current Feature
-**Feature:** Dynamic Homepage & Global Layout Wiring
+**Feature:** Editable Site Logo & Favicon
 
 ###### Status
-In Progress — branch feature/dynamic-homepage. Wiring up the Astro static components to Strapi Single Types.
+Completed — logo and favicon are editable media fields on the `global` Single Type, rendered in the header and document head.
 
-###### Goals
-* Create a `global` Single Type in Strapi for the editable Header and Footer navigation.
-* Fetch the `homepage` Single Type using native fetch (SSR with `prerender = false`) and populate the dynamic zone.
-* Create a `BlockRenderer.astro` component to dynamically map Strapi components (`blocks.hero`, `blocks.about`, etc.) to the UI.
-* Fetch the `global` Single Type in `Layout.astro` to populate the global Header and Footer.
+###### Paused
+* Sub-pages Backend Schemas — branch feature/sub-pages-schemas (WIP stashed: "WIP sub-pages-schemas").
 
 ###### History
+* Editable Site Logo & Favicon completed.
+* Dynamic Homepage & Global Layout Wiring completed.
 * Astro UI and Page Generation completed.
 * Astro Strapi Content Layer Integration completed.
 * Astro 6 Frontend Initialization completed.

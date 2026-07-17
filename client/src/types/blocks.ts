@@ -85,6 +85,8 @@ export type Block =
 
 export interface GlobalData {
 	siteName: string | null;
+	logo?: StrapiMedia | null;
+	favicon?: StrapiMedia | null;
 	navLinks?: SharedLink[] | null;
 	footerLinks?: SharedLink[] | null;
 }

@@ -1,24 +1,35 @@
 ---
-import type { SharedLink } from '../types/blocks';
+import type { SharedLink, StrapiMedia } from '../types/blocks';
+import { mediaUrl } from '../lib/strapi';
 
 interface Props {
 	siteName?: string | null;
+	logo?: StrapiMedia | null;
 	navLinks?: SharedLink[] | null;
 }
 
-const { siteName = 'KCCI Business Link', navLinks } = Astro.props;
+const { siteName = 'KCCI Business Link', logo, navLinks } = Astro.props;
 
 const links = navLinks ?? [];
+const logoUrl = mediaUrl(logo?.url);
 ---
 
 <header class="sticky top-0 z-50 border-b border-muted bg-background/80 backdrop-blur-md">
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 		<a href="/" class="group flex items-center gap-2.5 font-bold tracking-tight">
-			<span
-				class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3"
-			>
-				K
-			</span>
+			{
+				logoUrl ? (
+					<img
+						src={logoUrl}
+						alt={logo?.alternativeText ?? siteName ?? 'Logo'}
+						class="h-9 w-auto transition-transform duration-300 group-hover:scale-105"
+					/>
+				) : (
+					<span class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+						K
+					</span>
+				)
+			}
 			<span>{siteName}</span>
 		</a>
 		{

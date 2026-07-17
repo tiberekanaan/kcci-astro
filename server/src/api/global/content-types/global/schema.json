@@ -15,6 +15,18 @@
     "siteName": {
       "type": "string"
     },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "favicon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images", "files"]
+    },
     "navLinks": {
       "type": "component",
       "repeatable": true,

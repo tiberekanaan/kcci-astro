@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { fetchStrapi } from '../lib/strapi';
+import { fetchStrapi, mediaUrl } from '../lib/strapi';
 import type { GlobalData } from '../types/blocks';
 
 interface Props {
@@ -15,6 +15,10 @@ const { title = 'KCCI' } = Astro.props;
 // manage them in Strapi. Falls back to null (sensible defaults) if Strapi
 // is unreachable.
 const global = await fetchStrapi<GlobalData>('/api/global?populate=*');
+
+// Editor-uploaded favicon wins; the static /favicon.svg is the fallback.
+const faviconUrl = mediaUrl(global?.favicon?.url);
+const faviconType = faviconUrl?.endsWith('.svg') ? 'image/svg+xml' : undefined;
 ---
 
 <!doctype html>
@@ -22,13 +26,21 @@ const global = await fetchStrapi<GlobalData>('/api/global?populate=*');
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		{
+			faviconUrl ? (
+				<link rel="icon" type={faviconType} href={faviconUrl} />
+			) : (
+				<>
+					<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+					<link rel="icon" href="/favicon.ico" />
+				</>
+			)
+		}
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
 	<body class="bg-background text-foreground font-sans">
-		<Header siteName={global?.siteName} navLinks={global?.navLinks} />
+		<Header siteName={global?.siteName} logo={global?.logo} navLinks={global?.navLinks} />
 		<slot />
 		<Footer siteName={global?.siteName} footerLinks={global?.footerLinks} />
 	</body>
