@@ -22,6 +22,9 @@ export interface BlocksCta extends Struct.ComponentSchema {
   attributes: {
     button: Schema.Attribute.Component<'shared.button', false>;
     description: Schema.Attribute.Text;
+    image: Schema.Attribute.Media<'images'>;
+    imagePosition: Schema.Attribute.Enumeration<['right', 'left']> &
+      Schema.Attribute.DefaultTo<'right'>;
     title: Schema.Attribute.String;
   };
 }

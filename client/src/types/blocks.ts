@@ -74,6 +74,8 @@ export interface CtaBlock {
 	title: string | null;
 	description: string | null;
 	button?: SharedButton | null;
+	image?: StrapiMedia | null;
+	imagePosition?: 'right' | 'left' | null;
 }
 
 export type Block =

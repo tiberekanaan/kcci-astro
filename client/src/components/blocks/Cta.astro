@@ -1,14 +1,18 @@
 ---
 import type { CtaBlock } from '../../types/blocks';
+import { mediaUrl } from '../../lib/strapi';
 
 type Props = CtaBlock;
 
-const { title, description, button } = Astro.props;
+const { title, description, button, image, imagePosition } = Astro.props;
+
+const imageUrl = mediaUrl(image?.url);
+const imageLeft = imagePosition === 'left';
 ---
 
 <section id="join" class="mx-auto max-w-6xl px-6 py-20">
 	<div class="grid items-center gap-10 md:grid-cols-2">
-		<div data-reveal class="space-y-4">
+		<div data-reveal class:list={['space-y-4', imageLeft && 'md:order-2']}>
 			{title && <h2 class="text-3xl font-bold tracking-tight">{title}</h2>}
 			{description && <p class="text-muted-foreground">{description}</p>}
 			{
@@ -27,15 +31,37 @@ const { title, description, button } = Astro.props;
 				)
 			}
 		</div>
-		<div
-			data-reveal
-			class="group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg"
-			style="--reveal-delay: 120ms; background-image: linear-gradient(135deg, #6fae3d, #2f8f5b);"
-			role="img"
-			aria-label="KCCI members"
-		>
-			<div class="absolute -bottom-10 -left-10 h-40 w-40 animate-float-slow rounded-full bg-accent/30 blur-2xl"></div>
-			<div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_60%)]"></div>
-		</div>
+		{
+			imageUrl ? (
+				<div
+					data-reveal
+					class:list={[
+						'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
+						imageLeft && 'md:order-1',
+					]}
+					style="--reveal-delay: 120ms"
+				>
+					<img
+						src={imageUrl}
+						alt={image?.alternativeText ?? ''}
+						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+					/>
+				</div>
+			) : (
+				<div
+					data-reveal
+					class:list={[
+						'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
+						imageLeft && 'md:order-1',
+					]}
+					style="--reveal-delay: 120ms; background-image: linear-gradient(135deg, #6fae3d, #2f8f5b);"
+					role="img"
+					aria-label="KCCI members"
+				>
+					<div class="absolute -bottom-10 -left-10 h-40 w-40 animate-float-slow rounded-full bg-accent/30 blur-2xl" />
+					<div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
+				</div>
+			)
+		}
 	</div>
 </section>

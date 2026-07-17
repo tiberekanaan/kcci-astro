@@ -1,13 +1,14 @@
 ###### Current Feature
-**Feature:** Editable Site Logo & Favicon
+**Feature:** Editable CTA Images & Layout
 
 ###### Status
-Completed — logo and favicon are editable media fields on the `global` Single Type, rendered in the header and document head.
+Completed — CTA sections have an editable image and a right/left position toggle.
 
 ###### Paused
 * Sub-pages Backend Schemas — branch feature/sub-pages-schemas (WIP stashed: "WIP sub-pages-schemas").
 
 ###### History
+* Editable CTA Images & Layout completed.
 * Editable Site Logo & Favicon completed.
 * Dynamic Homepage & Global Layout Wiring completed.
 * Astro UI and Page Generation completed.
