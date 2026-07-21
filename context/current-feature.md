@@ -1,13 +1,11 @@
 ###### Current Feature
-**Feature:** Editable CTA Images & Layout
+**Feature:** Sub-pages Backend Schemas
 
 ###### Status
-Completed — CTA sections have an editable image and a right/left position toggle.
-
-###### Paused
-* Sub-pages Backend Schemas — branch feature/sub-pages-schemas (WIP stashed: "WIP sub-pages-schemas").
+Completed — `page`, `resource`, and `press-release` collection types created; generic pages render via the dynamic zone with markdown rich text.
 
 ###### History
+* Sub-pages Backend Schemas completed.
 * Editable CTA Images & Layout completed.
 * Editable Site Logo & Favicon completed.
 * Dynamic Homepage & Global Layout Wiring completed.

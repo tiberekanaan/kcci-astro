@@ -1,5 +1,6 @@
 ---
 import type { ServicesGridBlock } from '../../types/blocks';
+import { renderMarkdown } from '../../lib/markdown';
 
 type Props = ServicesGridBlock;
 
@@ -29,7 +30,7 @@ const serviceList = services ?? [];
 							service.bulletPoints && (
 								<div
 									class="prose prose-sm mt-4 max-w-none border-t border-muted pt-4 text-sm font-medium text-primary"
-									set:html={service.bulletPoints}
+									set:html={renderMarkdown(service.bulletPoints)}
 								/>
 							)
 						}

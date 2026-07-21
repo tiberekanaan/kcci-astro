@@ -1,14 +1,15 @@
 ---
 import type { AboutSectionBlock } from '../../types/blocks';
+import { renderMarkdown } from '../../lib/markdown';
 
 type Props = AboutSectionBlock;
 
 const { whoWeAre, vision, mission } = Astro.props;
 
 const rows = [
-	{ title: 'Who We Are', body: whoWeAre },
-	{ title: 'Our Vision', body: vision },
-	{ title: 'Our Mission', body: mission },
+	{ title: 'Who We Are', body: renderMarkdown(whoWeAre) },
+	{ title: 'Our Vision', body: renderMarkdown(vision) },
+	{ title: 'Our Mission', body: renderMarkdown(mission) },
 ].filter((row) => row.body);
 ---
 

@@ -43,6 +43,18 @@ export interface BlocksHero extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksRichText extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_rich_texts';
+  info: {
+    description: 'A free-form rich text content block.';
+    displayName: 'Rich Text';
+    icon: 'align-left';
+  };
+  attributes: {
+    body: Schema.Attribute.RichText;
+  };
+}
+
 export interface BlocksServicesGrid extends Struct.ComponentSchema {
   collectionName: 'components_blocks_services_grids';
   info: {
@@ -125,6 +137,7 @@ declare module '@strapi/strapi' {
       'blocks.about-section': BlocksAboutSection;
       'blocks.cta': BlocksCta;
       'blocks.hero': BlocksHero;
+      'blocks.rich-text': BlocksRichText;
       'blocks.services-grid': BlocksServicesGrid;
       'blocks.toolkit-grid': BlocksToolkitGrid;
       'shared.button': SharedButton;

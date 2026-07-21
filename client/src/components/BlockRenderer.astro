@@ -5,6 +5,7 @@ import AboutSection from './blocks/AboutSection.astro';
 import ServicesGrid from './blocks/ServicesGrid.astro';
 import ToolkitGrid from './blocks/ToolkitGrid.astro';
 import Cta from './blocks/Cta.astro';
+import RichText from './blocks/RichText.astro';
 
 interface Props {
 	block: Block;
@@ -26,6 +27,8 @@ const { block } = Astro.props;
 				return <ToolkitGrid {...block} />;
 			case 'blocks.cta':
 				return <Cta {...block} />;
+			case 'blocks.rich-text':
+				return <RichText {...block} />;
 			default:
 				// Unknown block types are skipped rather than breaking the page.
 				return null;

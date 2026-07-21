@@ -1,0 +1,18 @@
+---
+import type { RichTextBlock } from '../../types/blocks';
+import { renderMarkdown } from '../../lib/markdown';
+
+type Props = RichTextBlock;
+
+const { body } = Astro.props;
+
+const html = renderMarkdown(body);
+---
+
+{
+	html && (
+		<section class="mx-auto max-w-3xl px-6 py-16">
+			<div class="prose max-w-none text-muted-foreground" set:html={html} />
+		</section>
+	)
+}

@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { fetchStrapi } from '../lib/strapi';
+import type { Block } from '../types/blocks';
+
+// SSR: generic pages are composed from a Strapi `page` dynamic zone, matched by slug.
+export const prerender = false;
+
+interface Page {
+	title?: string | null;
+	content?: Block[] | null;
+}
+
+const { slug } = Astro.params;
+
+const pages = slug
+	? await fetchStrapi<Page[]>(
+			`/api/pages?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[content][populate]=*`,
+		)
+	: null;
+const page = pages?.[0];
+
+if (!page) {
+	return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
+const blocks = page.content ?? [];
+---
+
+<Layout title={page.title ?? 'KCCI'}>
+	{blocks.map((block) => <BlockRenderer block={block} />)}
+</Layout>
