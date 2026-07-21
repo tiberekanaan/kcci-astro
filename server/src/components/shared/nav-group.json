@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_nav_groups",
+  "info": {
+    "displayName": "Nav Group",
+    "icon": "bulletList",
+    "description": "Top-level nav item. With child links it renders as a non-clickable dropdown header; without them it is a plain link."
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string"
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    }
+  }
+}

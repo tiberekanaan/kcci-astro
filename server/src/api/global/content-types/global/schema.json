@@ -30,7 +30,7 @@
     "navLinks": {
       "type": "component",
       "repeatable": true,
-      "component": "shared.link"
+      "component": "shared.nav-group"
     },
     "footerLinks": {
       "type": "component",

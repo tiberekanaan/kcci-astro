@@ -556,7 +556,7 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     logo: Schema.Attribute.Media<'images'>;
-    navLinks: Schema.Attribute.Component<'shared.link', true>;
+    navLinks: Schema.Attribute.Component<'shared.nav-group', true>;
     publishedAt: Schema.Attribute.DateTime;
     siteName: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;

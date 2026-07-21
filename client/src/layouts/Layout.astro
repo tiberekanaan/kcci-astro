@@ -14,7 +14,9 @@ const { title = 'KCCI' } = Astro.props;
 // Site-wide nav/footer come from the `global` Single Type so editors can
 // manage them in Strapi. Falls back to null (sensible defaults) if Strapi
 // is unreachable.
-const global = await fetchStrapi<GlobalData>('/api/global?populate=*');
+const global = await fetchStrapi<GlobalData>(
+	'/api/global?populate[logo]=true&populate[favicon]=true&populate[footerLinks]=true&populate[navLinks][populate]=links',
+);
 
 // Editor-uploaded favicon wins; the static /favicon.svg is the fallback.
 const faviconUrl = mediaUrl(global?.favicon?.url);

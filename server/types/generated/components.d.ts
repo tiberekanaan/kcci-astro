@@ -106,6 +106,20 @@ export interface SharedLink extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedNavGroup extends Struct.ComponentSchema {
+  collectionName: 'components_shared_nav_groups';
+  info: {
+    description: 'Top-level nav item. With child links it renders as a non-clickable dropdown header; without them it is a plain link.';
+    displayName: 'Nav Group';
+    icon: 'bulletList';
+  };
+  attributes: {
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    links: Schema.Attribute.Component<'shared.link', true>;
+    url: Schema.Attribute.String;
+  };
+}
+
 export interface SharedServiceItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_service_items';
   info: {
@@ -142,6 +156,7 @@ declare module '@strapi/strapi' {
       'blocks.toolkit-grid': BlocksToolkitGrid;
       'shared.button': SharedButton;
       'shared.link': SharedLink;
+      'shared.nav-group': SharedNavGroup;
       'shared.service-item': SharedServiceItem;
       'shared.tool-item': SharedToolItem;
     }

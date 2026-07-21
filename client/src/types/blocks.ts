@@ -22,6 +22,13 @@ export interface SharedLink {
 	url: string | null;
 }
 
+export interface NavGroup {
+	id: number;
+	label: string | null;
+	url?: string | null;
+	links?: SharedLink[] | null;
+}
+
 export interface ServiceItem {
 	id: number;
 	title: string | null;
@@ -96,6 +103,6 @@ export interface GlobalData {
 	siteName: string | null;
 	logo?: StrapiMedia | null;
 	favicon?: StrapiMedia | null;
-	navLinks?: SharedLink[] | null;
+	navLinks?: NavGroup[] | null;
 	footerLinks?: SharedLink[] | null;
 }
