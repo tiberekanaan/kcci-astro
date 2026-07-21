@@ -10,7 +10,7 @@ const bgUrl = mediaUrl(backgroundImage?.url);
 const buttonList = buttons ?? [];
 ---
 
-<section class="relative isolate overflow-hidden text-white">
+<section class="relative isolate flex min-h-[calc(100svh-5rem)] items-center overflow-hidden text-white">
 	{
 		bgUrl ? (
 			<img
@@ -30,7 +30,7 @@ const buttonList = buttons ?? [];
 	<div class="absolute -right-16 top-10 -z-10 h-72 w-72 animate-float rounded-full bg-accent/30 blur-3xl"></div>
 	<div class="absolute -bottom-24 left-1/4 -z-10 h-64 w-64 animate-float-slow rounded-full bg-primary/40 blur-3xl"></div>
 
-	<div class="mx-auto max-w-6xl px-6 py-28 md:py-36">
+	<div class="mx-auto w-full max-w-6xl px-6 py-20">
 		<div class="max-w-2xl space-y-7">
 			<span
 				data-reveal
