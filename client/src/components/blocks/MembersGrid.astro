@@ -11,7 +11,7 @@ const { title, memberType } = Astro.props;
 // add/edit/delete profiles without touching the page's dynamic zone.
 const members =
 	(await fetchStrapi<Member[]>(
-		`/api/executive-members?filters[memberType][$eq]=${memberType ?? 'executive'}&populate=image&sort=name:asc&pagination[pageSize]=100`,
+		`/api/executive-members?filters[memberType][$eq]=${memberType ?? 'executive'}&populate=image&sort[0]=order:asc&sort[1]=name:asc&pagination[pageSize]=100`,
 	)) ?? [];
 
 ---

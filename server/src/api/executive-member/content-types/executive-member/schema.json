@@ -25,6 +25,11 @@
       "default": "executive",
       "required": true
     },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
     "bio": {
       "type": "richtext"
     },

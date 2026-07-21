@@ -110,14 +110,50 @@ const MEMBER_PAGES = [
   },
 ] as const;
 
+// Display order per seed member: position within its memberType group, in
+// steps of 10 so the client can slot real members in between.
+function seedOrderMap(): Map<string, number> {
+  const counters: Record<string, number> = {};
+  const map = new Map<string, number>();
+  for (const member of DUMMY_MEMBERS) {
+    const next = (counters[member.memberType] ?? 0) + 10;
+    counters[member.memberType] = next;
+    map.set(member.name, next);
+  }
+  return map;
+}
+
 async function seedDummyMembers(strapi: Core.Strapi) {
   const existing = await strapi.documents(MEMBER_UID).count({});
   if (existing > 0) return;
 
+  const orders = seedOrderMap();
   for (const member of DUMMY_MEMBERS) {
-    await strapi.documents(MEMBER_UID).create({ data: { ...member }, status: 'published' });
+    await strapi.documents(MEMBER_UID).create({
+      data: { ...member, order: orders.get(member.name) ?? 0 },
+      status: 'published',
+    });
   }
   strapi.log.info(`[seed] Created ${DUMMY_MEMBERS.length} dummy members.`);
+}
+
+// One-off migration: members created before the `order` field existed get a
+// sensible order (seed position for dummy entries, 0 otherwise).
+async function backfillMemberOrder(strapi: Core.Strapi) {
+  const members = await strapi.documents(MEMBER_UID).findMany({
+    filters: { order: { $null: true } },
+  });
+  if (members.length === 0) return;
+
+  const orders = seedOrderMap();
+  for (const member of members) {
+    await strapi.documents(MEMBER_UID).update({
+      documentId: member.documentId,
+      data: { order: orders.get(member.name ?? '') ?? 0 },
+      status: 'published',
+    });
+  }
+  strapi.log.info(`[seed] Backfilled order for ${members.length} members.`);
 }
 
 async function seedMemberGrids(strapi: Core.Strapi) {
@@ -177,6 +213,7 @@ export default {
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await seedDummyMembers(strapi);
+    await backfillMemberOrder(strapi);
     await seedMemberGrids(strapi);
   },
 };

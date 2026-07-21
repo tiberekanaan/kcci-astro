@@ -92,6 +92,7 @@ export interface Member {
 	role: string | null;
 	bio: string | null;
 	memberType: 'board' | 'executive' | null;
+	order?: number | null;
 	image?: StrapiMedia | null;
 }
 

@@ -499,6 +499,14 @@ export interface ApiExecutiveMemberExecutiveMember
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'executive'>;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
     role: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
