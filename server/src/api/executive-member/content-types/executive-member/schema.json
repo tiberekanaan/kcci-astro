@@ -4,8 +4,8 @@
   "info": {
     "singularName": "executive-member",
     "pluralName": "executive-members",
-    "displayName": "Executive Member",
-    "description": "KCCI executive committee members."
+    "displayName": "Member",
+    "description": "KCCI board of directors and executive committee members."
   },
   "options": {
     "draftAndPublish": true
@@ -18,6 +18,12 @@
     },
     "role": {
       "type": "string"
+    },
+    "memberType": {
+      "type": "enumeration",
+      "enum": ["board", "executive"],
+      "default": "executive",
+      "required": true
     },
     "bio": {
       "type": "richtext"

@@ -475,8 +475,8 @@ export interface ApiExecutiveMemberExecutiveMember
   extends Struct.CollectionTypeSchema {
   collectionName: 'executive_members';
   info: {
-    description: 'KCCI executive committee members.';
-    displayName: 'Executive Member';
+    description: 'KCCI board of directors and executive committee members.';
+    displayName: 'Member';
     pluralName: 'executive-members';
     singularName: 'executive-member';
   };
@@ -495,6 +495,9 @@ export interface ApiExecutiveMemberExecutiveMember
       'api::executive-member.executive-member'
     > &
       Schema.Attribute.Private;
+    memberType: Schema.Attribute.Enumeration<['board', 'executive']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'executive'>;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     role: Schema.Attribute.String;
@@ -624,6 +627,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.toolkit-grid',
         'blocks.cta',
         'blocks.rich-text',
+        'blocks.members-grid',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;

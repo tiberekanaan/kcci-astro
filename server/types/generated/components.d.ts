@@ -43,6 +43,21 @@ export interface BlocksHero extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksMembersGrid extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_members_grids';
+  info: {
+    description: 'Grid of member profiles filtered by member type.';
+    displayName: 'Members Grid';
+    icon: 'user';
+  };
+  attributes: {
+    memberType: Schema.Attribute.Enumeration<['board', 'executive']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'executive'>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksRichText extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_texts';
   info: {
@@ -151,6 +166,7 @@ declare module '@strapi/strapi' {
       'blocks.about-section': BlocksAboutSection;
       'blocks.cta': BlocksCta;
       'blocks.hero': BlocksHero;
+      'blocks.members-grid': BlocksMembersGrid;
       'blocks.rich-text': BlocksRichText;
       'blocks.services-grid': BlocksServicesGrid;
       'blocks.toolkit-grid': BlocksToolkitGrid;

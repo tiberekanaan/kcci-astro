@@ -85,6 +85,23 @@ export interface CtaBlock {
 	imagePosition?: 'right' | 'left' | null;
 }
 
+export interface Member {
+	id: number;
+	documentId: string;
+	name: string | null;
+	role: string | null;
+	bio: string | null;
+	memberType: 'board' | 'executive' | null;
+	image?: StrapiMedia | null;
+}
+
+export interface MembersGridBlock {
+	__component: 'blocks.members-grid';
+	id: number;
+	title: string | null;
+	memberType: 'board' | 'executive' | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -97,7 +114,8 @@ export type Block =
 	| ServicesGridBlock
 	| ToolkitGridBlock
 	| CtaBlock
-	| RichTextBlock;
+	| RichTextBlock
+	| MembersGridBlock;
 
 export interface GlobalData {
 	siteName: string | null;

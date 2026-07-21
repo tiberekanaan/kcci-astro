@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_blocks_members_grids",
+  "info": {
+    "displayName": "Members Grid",
+    "description": "Grid of member profiles filtered by member type.",
+    "icon": "user"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "memberType": {
+      "type": "enumeration",
+      "enum": ["board", "executive"],
+      "default": "executive",
+      "required": true
+    }
+  }
+}

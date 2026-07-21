@@ -50,6 +50,7 @@ const executiveMembers = defineCollection({
     name: z.string(),
     role: z.string().nullish(),
     bio: z.string().nullish(),
+    memberType: z.enum(['board', 'executive']).nullish(),
     image: strapiImage.nullish(),
   }),
 });

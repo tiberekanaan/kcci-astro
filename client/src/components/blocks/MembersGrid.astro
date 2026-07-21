@@ -1,0 +1,67 @@
+---
+import type { Member, MembersGridBlock } from '../../types/blocks';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
+import { renderMarkdown } from '../../lib/markdown';
+
+type Props = MembersGridBlock;
+
+const { title, memberType } = Astro.props;
+
+// SSR: members are managed as a Strapi collection so the client can
+// add/edit/delete profiles without touching the page's dynamic zone.
+const members =
+	(await fetchStrapi<Member[]>(
+		`/api/executive-members?filters[memberType][$eq]=${memberType ?? 'executive'}&populate=image&sort=name:asc&pagination[pageSize]=100`,
+	)) ?? [];
+
+---
+
+<section class="py-20">
+	<div class="mx-auto max-w-6xl px-6">
+		{title && <h2 data-reveal class="mb-12 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+		{
+			members.length === 0 ? (
+				<p class="text-center text-muted-foreground">Member profiles are coming soon.</p>
+			) : (
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{members.map((member, i) => (
+						<article
+							data-reveal
+							style={`--reveal-delay: ${i * 110}ms`}
+							class="group flex flex-col overflow-hidden rounded-2xl border border-muted bg-background transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+						>
+							{member.image?.url ? (
+								<img
+									src={mediaUrl(member.image.url)}
+									alt={member.image.alternativeText ?? member.name ?? ''}
+									class="aspect-[4/3] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+									loading="lazy"
+								/>
+							) : (
+								<div
+									class="flex aspect-[4/3] w-full items-end justify-center overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10"
+									role="img"
+									aria-label={`Default avatar for ${member.name ?? 'member'}`}
+								>
+									<svg class="h-3/4 w-auto text-primary/25" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+										<path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2.25c-4.97 0-9 2.51-9 5.61V24h18v-4.14c0-3.1-4.03-5.61-9-5.61Z" />
+									</svg>
+								</div>
+							)}
+							<div class="flex flex-1 flex-col p-6">
+								<h3 class="text-lg font-semibold">{member.name}</h3>
+								{member.role && <p class="mt-1 text-sm font-medium text-primary">{member.role}</p>}
+								{member.bio && (
+									<div
+										class="prose prose-sm mt-4 max-w-none flex-1 text-sm text-muted-foreground"
+										set:html={renderMarkdown(member.bio)}
+									/>
+								)}
+							</div>
+						</article>
+					))}
+				</div>
+			)
+		}
+	</div>
+</section>

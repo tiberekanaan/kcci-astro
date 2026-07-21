@@ -18,25 +18,4 @@ const blocks = homepage?.content ?? [];
 
 <Layout title={homepage?.title ?? 'KCCI · Grow Your Business With Us'}>
 	{blocks.map((block) => <BlockRenderer block={block} />)}
-
-	<!-- Progressive scroll-reveal: lift + fade elements in as they appear. -->
-	<script>
-		const reveals = document.querySelectorAll('[data-reveal]');
-		if ('IntersectionObserver' in window) {
-			const io = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (entry.isIntersecting) {
-							entry.target.classList.add('is-visible');
-							io.unobserve(entry.target);
-						}
-					}
-				},
-				{ threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
-			);
-			reveals.forEach((el) => io.observe(el));
-		} else {
-			reveals.forEach((el) => el.classList.add('is-visible'));
-		}
-	</script>
 </Layout>
