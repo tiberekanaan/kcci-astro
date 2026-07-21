@@ -582,6 +582,7 @@ export interface ApiHomepageHomepage extends Struct.SingleTypeSchema {
         'blocks.services-grid',
         'blocks.toolkit-grid',
         'blocks.cta',
+        'blocks.rich-text',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;
