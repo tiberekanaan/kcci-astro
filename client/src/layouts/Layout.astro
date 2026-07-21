@@ -41,9 +41,11 @@ const faviconType = faviconUrl?.endsWith('.svg') ? 'image/svg+xml' : undefined;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="bg-background text-foreground font-sans">
+	<body class="bg-background text-foreground font-sans flex min-h-screen flex-col">
 		<Header siteName={global?.siteName} logo={global?.logo} navLinks={global?.navLinks} />
-		<slot />
+		<div class="flex-1">
+			<slot />
+		</div>
 		<Footer siteName={global?.siteName} footerLinks={global?.footerLinks} />
 
 		<!-- Progressive scroll-reveal: lift + fade [data-reveal] elements in as
