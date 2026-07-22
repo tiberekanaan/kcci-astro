@@ -32,18 +32,10 @@ const buttonList = buttons ?? [];
 
 	<div class="mx-auto w-full max-w-6xl px-6 py-20">
 		<div class="max-w-2xl space-y-7">
-			<span
-				data-reveal
-				class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur"
-			>
-				<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-				Kiribati Chamber of Commerce &amp; Industry
-			</span>
 			{
 				title && (
 					<h1
 						data-reveal
-						style="--reveal-delay: 80ms"
 						class="text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl"
 						set:html={title}
 					/>
@@ -51,14 +43,14 @@ const buttonList = buttons ?? [];
 			}
 			{
 				subtitle && (
-					<p data-reveal style="--reveal-delay: 160ms" class="max-w-xl text-base text-white/85 md:text-lg">
+					<p data-reveal style="--reveal-delay: 80ms" class="max-w-xl text-base text-white/85 md:text-lg">
 						{subtitle}
 					</p>
 				)
 			}
 			{
 				buttonList.length > 0 && (
-					<div data-reveal style="--reveal-delay: 240ms" class="flex flex-wrap items-center gap-4 pt-2">
+					<div data-reveal style="--reveal-delay: 160ms" class="flex flex-wrap items-center gap-4 pt-2">
 						{buttonList.map((button, i) => (
 							<a
 								href={button.url ?? '#'}
