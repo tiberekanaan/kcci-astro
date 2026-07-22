@@ -82,11 +82,121 @@ const logoUrl = mediaUrl(logo?.url);
 				</nav>
 			)
 		}
-		<a
-			href="#join"
-			class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-dark hover:shadow-md hover:shadow-primary/20 active:scale-95"
-		>
-			Join
-		</a>
+		<div class="flex items-center gap-2">
+			<a
+				href="#join"
+				class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-dark hover:shadow-md hover:shadow-primary/20 active:scale-95"
+			>
+				Join
+			</a>
+			{
+				links.length > 0 && (
+					<button
+						type="button"
+						id="mobile-nav-toggle"
+						class="grid h-10 w-10 place-items-center rounded-lg text-foreground transition-colors hover:bg-muted md:hidden"
+						aria-expanded="false"
+						aria-controls="mobile-nav"
+						aria-label="Open menu"
+					>
+						<svg
+							id="mobile-nav-icon-open"
+							class="h-6 w-6"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<path d="M4 7h16M4 12h16M4 17h16" />
+						</svg>
+						<svg
+							id="mobile-nav-icon-close"
+							class="hidden h-6 w-6"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<path d="M6 6l12 12M18 6L6 18" />
+						</svg>
+					</button>
+				)
+			}
+		</div>
 	</div>
+	{
+		links.length > 0 && (
+			<div id="mobile-nav" class="hidden border-t border-muted bg-background md:hidden">
+				<nav class="mx-auto max-w-6xl space-y-1 px-4 py-4 text-sm font-medium text-muted-foreground">
+					{links.map((item) =>
+						(item.links?.length ?? 0) > 0 ? (
+							<details class="group">
+								<summary class="flex cursor-pointer list-none items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-muted hover:text-primary [&::-webkit-details-marker]:hidden">
+									{item.label}
+									<svg
+										class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+										aria-hidden="true"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.23 8.27a.75.75 0 0 1 .02-1.06Z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</summary>
+								<div class="ml-4 border-l border-muted pl-2">
+									{item.links?.map((child) => (
+										<a
+											href={child.url ?? '#'}
+											class="block rounded-lg px-3 py-2 transition-colors hover:bg-muted hover:text-primary"
+										>
+											{child.label}
+										</a>
+									))}
+								</div>
+							</details>
+						) : (
+							<a
+								href={item.url ?? '#'}
+								class="block rounded-lg px-3 py-2.5 transition-colors hover:bg-muted hover:text-primary"
+							>
+								{item.label}
+							</a>
+						),
+					)}
+				</nav>
+			</div>
+		)
+	}
 </header>
+
+<script>
+	const toggle = document.getElementById('mobile-nav-toggle');
+	const panel = document.getElementById('mobile-nav');
+	const iconOpen = document.getElementById('mobile-nav-icon-open');
+	const iconClose = document.getElementById('mobile-nav-icon-close');
+
+	function setOpen(open: boolean) {
+		if (!toggle || !panel || !iconOpen || !iconClose) return;
+		panel.classList.toggle('hidden', !open);
+		iconOpen.classList.toggle('hidden', open);
+		iconClose.classList.toggle('hidden', !open);
+		toggle.setAttribute('aria-expanded', String(open));
+		toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+	}
+
+	toggle?.addEventListener('click', () => {
+		setOpen(panel?.classList.contains('hidden') ?? false);
+	});
+
+	// Close the panel after navigating (also covers same-page #anchor links).
+	panel?.querySelectorAll('a').forEach((link) => {
+		link.addEventListener('click', () => setOpen(false));
+	});
+</script>

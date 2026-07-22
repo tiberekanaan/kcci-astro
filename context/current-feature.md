@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Footer BLP Logo & Attribution
+**Feature:** Mobile Navigation Menu
 
 ###### Status
-Completed — new `footerLogo` (single image media) and `footerAttribution` (text) fields on the `Global` single type so the footer partner logo and its credit line are editable in Strapi instead of hard-coded. The footer renders the logo on a small white card in the branding column with the attribution text below it ("This website was developed in collaboration with Business Link Pacific, funded by The Ministry of Foreign Affairs New Zealand."). One-time bootstrap seed uploads `server/data/blp-logo.webp` and sets the attribution only while the fields are still `NULL`, so editor changes are never overwritten. The footer was restyled as a dark page-closer: deep palm-green gradient, golden accent line along the top edge, the BLP logo on a white rounded card, and a thin-bordered copyright strip.
+Completed — the header nav was `hidden md:flex`, so below 768px the navigation disappeared entirely with no way to reach any links. Adds a burger toggle button (visible only below `md`) that slides open a mobile panel under the sticky header: plain links render as full-width rows, nav dropdown groups render as native `<details>` collapsibles with a rotating chevron (zero extra JS for group expansion). A small inline script toggles the panel/burger↔close icons/`aria-expanded`, and closes the menu when a link is tapped. Desktop nav is unchanged.
 
 ###### History
+* Mobile Navigation Menu completed.
 * Footer BLP Logo & Attribution completed.
 * Homepage CTA Layout Variants completed.
 * Our Partners Page completed.
