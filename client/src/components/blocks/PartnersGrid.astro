@@ -1,0 +1,75 @@
+---
+import type { PartnersGridBlock } from '../../types/blocks';
+import { mediaUrl } from '../../lib/strapi';
+
+type Props = PartnersGridBlock;
+
+const { title, partners } = Astro.props;
+const items = partners ?? [];
+---
+
+<section class="py-20">
+	<div class="mx-auto max-w-6xl px-6">
+		{title && <h2 data-reveal class="mb-12 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+		{
+			items.length === 0 ? (
+				<p class="text-center text-muted-foreground">Partner organisations are coming soon.</p>
+			) : (
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{items.map((partner, i) => {
+						const card = (
+							<>
+								{partner.logo?.url ? (
+									<img
+										src={mediaUrl(partner.logo.url)}
+										alt={partner.logo.alternativeText ?? partner.name ?? ''}
+										class="h-28 w-28 shrink-0 rounded-xl object-contain transition-transform duration-500 group-hover:scale-[1.05]"
+										loading="lazy"
+									/>
+								) : (
+									<div
+										class="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-accent/10"
+										role="img"
+										aria-label={`Placeholder logo for ${partner.name ?? 'partner'}`}
+									>
+										<span class="text-3xl font-bold text-primary/40">{(partner.name ?? '?').charAt(0)}</span>
+									</div>
+								)}
+								<div class="flex flex-1 flex-col items-center text-center">
+									<h3 class="text-lg font-semibold">{partner.name}</h3>
+									{partner.websiteUrl && (
+										<p class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+											Visit website
+											<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+												<path d="M7 17 17 7M7 7h10v10" />
+											</svg>
+										</p>
+									)}
+								</div>
+							</>
+						);
+						const cardClass =
+							'group flex flex-col items-center gap-6 rounded-2xl border border-muted bg-background p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5';
+						return partner.websiteUrl ? (
+							<a
+								data-reveal
+								style={`--reveal-delay: ${i * 110}ms`}
+								href={partner.websiteUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label={`${partner.name ?? 'Partner'} website (opens in a new tab)`}
+								class={cardClass}
+							>
+								{card}
+							</a>
+						) : (
+							<div data-reveal style={`--reveal-delay: ${i * 110}ms`} class={cardClass}>
+								{card}
+							</div>
+						);
+					})}
+				</div>
+			)
+		}
+	</div>
+</section>

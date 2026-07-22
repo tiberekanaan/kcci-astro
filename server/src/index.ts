@@ -1128,6 +1128,185 @@ async function seedContactNav(strapi: Core.Strapi) {
   strapi.log.info('[seed] Wired the "Contact" nav link.');
 }
 
+// Dummy partner organisations for the /our-partners page — placeholders the
+// client replaces with real partners (and their real logos) in the admin.
+const DUMMY_PARTNERS = [
+  {
+    name: 'Pacific Trade Invest Australia',
+    websiteUrl: 'https://pacifictradeinvest.com',
+  },
+  {
+    name: 'Fiji Commerce & Employers Federation',
+    websiteUrl: 'https://fcef.com.fj',
+  },
+  {
+    name: 'Ministry of Commerce, Industry & Cooperatives',
+    websiteUrl: 'https://www.commerce.gov.ki',
+  },
+  {
+    name: 'Pacific Islands Private Sector Organisation',
+    websiteUrl: 'https://pipso.org.fj',
+  },
+  {
+    name: 'Tourism Authority of Kiribati',
+    websiteUrl: 'https://www.kiribatitourism.gov.ki',
+  },
+  {
+    name: 'UNDP Pacific Office',
+    websiteUrl: 'https://www.undp.org/pacific',
+  },
+] as const;
+
+// Build a simple square SVG logo (gradient disc + organisation initials) so
+// seeded partners ship with a real image in the media library.
+function makeLogoSvg(name: string, index: number): Buffer {
+  const escapeXml = (text: string) =>
+    text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const skip = new Set(['of', 'the', 'and', '&', 'for']);
+  const initials = name
+    .split(/[\s,]+/)
+    .filter((word) => word && !skip.has(word.toLowerCase()))
+    .map((word) => word[0].toUpperCase())
+    .slice(0, 3)
+    .join('');
+
+  const [from, to] = COVER_PALETTES[index % COVER_PALETTES.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${from}"/>
+      <stop offset="1" stop-color="${to}"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" rx="48" fill="#ffffff"/>
+  <circle cx="300" cy="300" r="210" fill="url(#bg)"/>
+  <circle cx="300" cy="300" r="210" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="10"/>
+  <text x="300" y="300" text-anchor="middle" dominant-baseline="central" font-family="Verdana, sans-serif" font-size="120" font-weight="bold" letter-spacing="4" fill="#ffffff">${escapeXml(initials)}</text>
+</svg>
+`;
+  return Buffer.from(svg, 'utf8');
+}
+
+// Wire the /our-partners page: create it if missing (uploading generated
+// logos), and add its Partners Grid block unless the client has already
+// customised the page content.
+async function seedPartnersPage(strapi: Core.Strapi) {
+  const page = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'our-partners' },
+    populate: { content: { populate: '*' } },
+  });
+
+  const existingContent = page?.content ?? [];
+  if (existingContent.some((block) => block.__component === 'blocks.partners-grid')) return;
+
+  const onlyPlaceholders = existingContent.every(
+    (block) =>
+      block.__component === 'blocks.rich-text' && (block.body ?? '').includes('Placeholder content'),
+  );
+  if (page && !onlyPlaceholders) {
+    strapi.log.warn(
+      '[seed] Page "our-partners" has custom content; add the Partners Grid block manually.',
+    );
+    return;
+  }
+
+  const tmpDir = await mkdtemp(join(tmpdir(), 'kcci-seed-partners-'));
+  try {
+    const partners: { name: string; websiteUrl: string; logo?: number }[] = [];
+    for (const [index, partner] of DUMMY_PARTNERS.entries()) {
+      const svg = makeLogoSvg(partner.name, index);
+      const fileName = `${partner.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-logo.svg`;
+      const filePath = join(tmpDir, fileName);
+      await writeFile(filePath, svg);
+
+      const [uploaded] = await strapi
+        .plugin('upload')
+        .service('upload')
+        .upload({
+          data: {
+            fileInfo: { name: `${partner.name} logo`, caption: null, alternativeText: partner.name },
+          },
+          files: {
+            filepath: filePath,
+            originalFilename: fileName,
+            mimetype: 'image/svg+xml',
+            size: svg.length,
+          },
+        });
+
+      partners.push({ ...partner, ...(uploaded?.id ? { logo: uploaded.id } : {}) });
+    }
+
+    const content = [
+      {
+        __component: 'blocks.rich-text' as const,
+        body: '# Our Partners\n\nKCCI works alongside government, regional and international organisations to strengthen the private sector in Kiribati. We thank our partners for their continued support.',
+      },
+      {
+        __component: 'blocks.partners-grid' as const,
+        title: 'Organisations We Work With',
+        partners,
+      },
+    ];
+
+    if (!page) {
+      await strapi.documents(PAGE_UID).create({
+        data: { title: 'Our Partners', slug: 'our-partners', content },
+        status: 'published',
+      });
+      strapi.log.info('[seed] Created the "our-partners" page with a Partners Grid block.');
+      return;
+    }
+
+    await strapi.documents(PAGE_UID).update({
+      documentId: page.documentId,
+      data: { content },
+      status: 'published',
+    });
+    strapi.log.info('[seed] Added the Partners Grid block to "our-partners".');
+  } finally {
+    await rm(tmpDir, { recursive: true, force: true });
+  }
+}
+
+// Nest an "Our Partners" link under the "About Us" nav dropdown. Skipped once
+// a matching link exists anywhere in the nav (seeded or edited).
+async function seedPartnersNav(strapi: Core.Strapi) {
+  const global = await strapi.documents(GLOBAL_UID).findFirst({
+    populate: { navLinks: { populate: '*' } },
+  });
+  if (!global) return;
+
+  const navLinks = global.navLinks ?? [];
+  const isPartnersLink = (link: { label?: string | null; url?: string | null }) =>
+    link.url === '/our-partners' || /^our partners$/i.test(link.label ?? '');
+  const alreadyLinked = navLinks.some(
+    (group) => isPartnersLink(group) || (group.links ?? []).some(isPartnersLink),
+  );
+  if (alreadyLinked) return;
+
+  const aboutIndex = navLinks.findIndex((group) => /^about( us)?$/i.test(group.label ?? ''));
+  if (aboutIndex === -1) {
+    strapi.log.warn('[seed] No "About Us" nav group found; add the "Our Partners" link manually.');
+    return;
+  }
+
+  // Components must be re-sent in full (without ids) when updating.
+  const rebuilt = navLinks.map((group) => ({
+    label: group.label,
+    url: group.url,
+    links: (group.links ?? []).map((link) => ({ label: link.label, url: link.url })),
+  }));
+  rebuilt[aboutIndex].links.push({ label: 'Our Partners', url: '/our-partners' });
+
+  await strapi.documents(GLOBAL_UID).update({
+    documentId: global.documentId,
+    data: { navLinks: rebuilt },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Nested the "Our Partners" link under "About Us".');
+}
+
 async function seedMemberGrids(strapi: Core.Strapi) {
   for (const def of MEMBER_PAGES) {
     const page = await strapi.documents(PAGE_UID).findFirst({
@@ -1201,5 +1380,7 @@ export default {
     await seedPublicEventPermissions(strapi);
     await seedContactPage(strapi);
     await seedContactNav(strapi);
+    await seedPartnersPage(strapi);
+    await seedPartnersNav(strapi);
   },
 };

@@ -168,6 +168,20 @@ export interface ContactBlock {
 	mapEmbedUrl: string | null;
 }
 
+export interface PartnerItem {
+	id: number;
+	name: string | null;
+	websiteUrl: string | null;
+	logo?: StrapiMedia | null;
+}
+
+export interface PartnersGridBlock {
+	__component: 'blocks.partners-grid';
+	id: number;
+	title: string | null;
+	partners?: PartnerItem[] | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -185,7 +199,8 @@ export type Block =
 	| ResourcesListBlock
 	| PressReleasesListBlock
 	| EventsListBlock
-	| ContactBlock;
+	| ContactBlock
+	| PartnersGridBlock;
 
 export interface GlobalData {
 	siteName: string | null;

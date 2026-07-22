@@ -640,6 +640,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.press-releases-list',
         'blocks.events-list',
         'blocks.contact',
+        'blocks.partners-grid',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;

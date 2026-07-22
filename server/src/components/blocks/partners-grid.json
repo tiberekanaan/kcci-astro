@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_blocks_partners_grids",
+  "info": {
+    "displayName": "Partners Grid",
+    "icon": "globe",
+    "description": "Grid of partner organisations with logo, name and website link."
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "partners": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.partner-item"
+    }
+  }
+}

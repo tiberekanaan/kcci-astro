@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Contact Page
+**Feature:** Our Partners Page
 
 ###### Status
-Completed — `/contact` renders a new `blocks.contact` dynamic-zone block (title, phone, email, address, officeHours, mapEmbedUrl) with contact detail cards, an embedded Google map of the KCCI office in Betio, and a contact form (name, email, subject, message + honeypot). The form submits through an Astro Action (`src/actions/index.ts`) that validates with Zod 4 and emails secretariat@kcci.org.ki via nodemailer over Zoho SMTP; credentials come from `astro:env` server secrets (SMTP_HOST/PORT/USER/PASS, CONTACT_EMAIL — placeholders commented in `client/.env`). Without SMTP configured, dev logs the email to the console and production returns a friendly error. Progressive enhancement: plain POST works without JS (result via `Astro.getActionResult`), an inline script upgrades to fetch with inline field errors and success/failure banners. Seed creates the `contact` page (rich-text intro + Contact block, only when missing or placeholder-only) and wires a "Contact" nav link (repointing any legacy `#contact` anchor).
+Completed — `/our-partners` page listing partner organisations (name, website link, logo) via a new `blocks.partners-grid` dynamic-zone block backed by a repeatable `shared.partner-item` component (name, websiteUrl, logo media). Cards link to the partner website and open in a new tab (`target="_blank" rel="noopener noreferrer"`). Seed creates the page (rich-text intro + Partners Grid with dummy partners and generated SVG logos, only when missing or placeholder-only) and nests an "Our Partners" link under the "About Us" nav dropdown.
 
 ###### History
+* Contact Page completed.
 * Events Page completed.
 * Press Release Page completed.
 * Resources Document List completed.

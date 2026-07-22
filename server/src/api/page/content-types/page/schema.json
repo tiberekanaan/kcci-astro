@@ -33,7 +33,8 @@
         "blocks.resources-list",
         "blocks.press-releases-list",
         "blocks.events-list",
-        "blocks.contact"
+        "blocks.contact",
+        "blocks.partners-grid"
       ]
     }
   }

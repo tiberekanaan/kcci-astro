@@ -86,6 +86,19 @@ export interface BlocksMembersGrid extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksPartnersGrid extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_partners_grids';
+  info: {
+    description: 'Grid of partner organisations with logo, name and website link.';
+    displayName: 'Partners Grid';
+    icon: 'globe';
+  };
+  attributes: {
+    partners: Schema.Attribute.Component<'shared.partner-item', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksPressReleasesList extends Struct.ComponentSchema {
   collectionName: 'components_blocks_press_releases_lists';
   info: {
@@ -190,6 +203,20 @@ export interface SharedNavGroup extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedPartnerItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_partner_items';
+  info: {
+    description: 'A partner organisation: name, website link and logo.';
+    displayName: 'Partner Item';
+    icon: 'earth';
+  };
+  attributes: {
+    logo: Schema.Attribute.Media<'images'>;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    websiteUrl: Schema.Attribute.String;
+  };
+}
+
 export interface SharedServiceItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_service_items';
   info: {
@@ -224,6 +251,7 @@ declare module '@strapi/strapi' {
       'blocks.events-list': BlocksEventsList;
       'blocks.hero': BlocksHero;
       'blocks.members-grid': BlocksMembersGrid;
+      'blocks.partners-grid': BlocksPartnersGrid;
       'blocks.press-releases-list': BlocksPressReleasesList;
       'blocks.resources-list': BlocksResourcesList;
       'blocks.rich-text': BlocksRichText;
@@ -232,6 +260,7 @@ declare module '@strapi/strapi' {
       'shared.button': SharedButton;
       'shared.link': SharedLink;
       'shared.nav-group': SharedNavGroup;
+      'shared.partner-item': SharedPartnerItem;
       'shared.service-item': SharedServiceItem;
       'shared.tool-item': SharedToolItem;
     }

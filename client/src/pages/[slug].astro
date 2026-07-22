@@ -14,9 +14,30 @@ interface Page {
 
 const { slug } = Astro.params;
 
+// Dynamic-zone populate uses the `on` fragment syntax: a plain `*` only goes
+// one level deep, which misses media nested inside repeatable components
+// (e.g. partner logos). Every block type must be listed or it is omitted
+// from the response.
+const contentPopulate = [
+	'blocks.hero',
+	'blocks.about-section',
+	'blocks.services-grid',
+	'blocks.toolkit-grid',
+	'blocks.cta',
+	'blocks.rich-text',
+	'blocks.members-grid',
+	'blocks.resources-list',
+	'blocks.press-releases-list',
+	'blocks.events-list',
+	'blocks.contact',
+]
+	.map((name) => `populate[content][on][${name}][populate]=*`)
+	.concat('populate[content][on][blocks.partners-grid][populate][partners][populate]=logo')
+	.join('&');
+
 const pages = slug
 	? await fetchStrapi<Page[]>(
-			`/api/pages?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[content][populate]=*`,
+			`/api/pages?filters[slug][$eq]=${encodeURIComponent(slug)}&${contentPopulate}`,
 		)
 	: null;
 const page = pages?.[0];

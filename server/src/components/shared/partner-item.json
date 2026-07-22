@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_partner_items",
+  "info": {
+    "displayName": "Partner Item",
+    "icon": "earth",
+    "description": "A partner organisation: name, website link and logo."
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "websiteUrl": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}
