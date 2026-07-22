@@ -12,6 +12,13 @@ const { siteName = 'KCCI Business Link', logo, navLinks } = Astro.props;
 
 const links = navLinks ?? [];
 const logoUrl = mediaUrl(logo?.url);
+
+// Member registration is handled by an external Softr app.
+const registrationUrl = 'https://kcci.softr.app/registration';
+
+const isExternal = (url?: string | null) => /^https?:\/\//.test(url ?? '');
+const externalAttrs = (url?: string | null) =>
+	isExternal(url) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 ---
 
 <header class="sticky top-0 z-50 border-b border-muted bg-background/80 backdrop-blur-md">
@@ -61,7 +68,7 @@ const logoUrl = mediaUrl(logo?.url);
 									<div class="min-w-52 rounded-xl border border-muted bg-background p-2 shadow-lg shadow-foreground/5">
 										{item.links?.map((child) => (
 											<a
-												href={child.url ?? '#'}
+												href={child.url ?? '#'} {...externalAttrs(child.url)}
 												class="block rounded-lg px-3 py-2 transition-colors hover:bg-muted hover:text-primary"
 											>
 												{child.label}
@@ -72,7 +79,7 @@ const logoUrl = mediaUrl(logo?.url);
 							</div>
 						) : (
 							<a
-								href={item.url ?? '#'}
+								href={item.url ?? '#'} {...externalAttrs(item.url)}
 								class="relative transition-colors hover:text-primary after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-accent after:transition-all after:duration-300 hover:after:w-full"
 							>
 								{item.label}
@@ -84,7 +91,7 @@ const logoUrl = mediaUrl(logo?.url);
 		}
 		<div class="flex items-center gap-2">
 			<a
-				href="#join"
+				href={registrationUrl} target="_blank" rel="noopener noreferrer"
 				class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-dark hover:shadow-md hover:shadow-primary/20 active:scale-95"
 			>
 				Join
@@ -153,7 +160,7 @@ const logoUrl = mediaUrl(logo?.url);
 								<div class="ml-4 border-l border-muted pl-2">
 									{item.links?.map((child) => (
 										<a
-											href={child.url ?? '#'}
+											href={child.url ?? '#'} {...externalAttrs(child.url)}
 											class="block rounded-lg px-3 py-2 transition-colors hover:bg-muted hover:text-primary"
 										>
 											{child.label}
@@ -163,7 +170,7 @@ const logoUrl = mediaUrl(logo?.url);
 							</details>
 						) : (
 							<a
-								href={item.url ?? '#'}
+								href={item.url ?? '#'} {...externalAttrs(item.url)}
 								class="block rounded-lg px-3 py-2.5 transition-colors hover:bg-muted hover:text-primary"
 							>
 								{item.label}

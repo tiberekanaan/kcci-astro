@@ -1420,6 +1420,61 @@ async function seedFooterAttribution(strapi: Core.Strapi) {
   strapi.log.info('[seed] Seeded footer BLP logo/attribution.');
 }
 
+// Member registration lives in an external Softr app: repoint the nav
+// "Registration" link there and drop the placeholder /registration page.
+const REGISTRATION_URL = 'https://kcci.softr.app/registration';
+
+async function seedRegistrationLink(strapi: Core.Strapi) {
+  const global = await strapi.documents(GLOBAL_UID).findFirst({
+    populate: { navLinks: { populate: '*' } },
+  });
+  if (global) {
+    const navLinks = global.navLinks ?? [];
+    const isRegistration = (link: { label?: string | null; url?: string | null }) =>
+      link.url === '/registration' || /^registration$/i.test(link.label ?? '');
+    const needsUpdate = navLinks.some((group) =>
+      (group.links ?? []).some((link) => isRegistration(link) && link.url !== REGISTRATION_URL),
+    );
+
+    if (needsUpdate) {
+      // Components must be re-sent in full (without ids) when updating.
+      const rebuilt = navLinks.map((group) => ({
+        label: group.label,
+        url: group.url,
+        links: (group.links ?? []).map((link) => ({
+          label: link.label,
+          url: isRegistration(link) ? REGISTRATION_URL : link.url,
+        })),
+      }));
+      await strapi.documents(GLOBAL_UID).update({
+        documentId: global.documentId,
+        data: { navLinks: rebuilt },
+        status: 'published',
+      });
+      strapi.log.info('[seed] Pointed the "Registration" nav link at the Softr app.');
+    }
+  }
+
+  const page = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'registration' },
+  });
+  if (page) {
+    await strapi.documents(PAGE_UID).delete({ documentId: page.documentId });
+    strapi.log.info('[seed] Removed the placeholder "registration" page.');
+  }
+
+  // "Join Now" buttons (homepage Hero + bottom CTA banner) still carrying the
+  // seeded placeholder URL. Components are not documents, so use the Query
+  // Engine; scoping by the old URL leaves editor-customised buttons alone.
+  const { count } = await strapi.db.query('shared.button').updateMany({
+    where: { label: 'Join Now', url: 'www.kcci.org.ki' },
+    data: { url: REGISTRATION_URL, isExternal: true },
+  });
+  if (count > 0) {
+    strapi.log.info(`[seed] Pointed ${count} "Join Now" button(s) at the Softr app.`);
+  }
+}
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -1458,5 +1513,6 @@ export default {
     await seedPartnersNav(strapi);
     await backfillCtaVariants(strapi);
     await seedFooterAttribution(strapi);
+    await seedRegistrationLink(strapi);
   },
 };

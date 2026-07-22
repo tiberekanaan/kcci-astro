@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Mobile Navigation Menu
+**Feature:** External Registration Link (Softr)
 
 ###### Status
-Completed — the header nav was `hidden md:flex`, so below 768px the navigation disappeared entirely with no way to reach any links. Adds a burger toggle button (visible only below `md`) that slides open a mobile panel under the sticky header: plain links render as full-width rows, nav dropdown groups render as native `<details>` collapsibles with a rotating chevron (zero extra JS for group expansion). A small inline script toggles the panel/burger↔close icons/`aria-expanded`, and closes the menu when a link is tapped. Desktop nav is unchanged.
+Completed — member registration is handled by a separate Softr app at `https://kcci.softr.app/registration`, but the nav "Registration" link (Membership dropdown) pointed to the internal placeholder page `/registration`. Adds an idempotent Strapi seed (`seedRegistrationLink`) that repoints the nav link at the Softr URL, deletes the placeholder `registration` page, and repoints the homepage "Join Now" buttons (Hero + bottom CTA banner) from the placeholder `www.kcci.org.ki` URL to the Softr app with `isExternal` set. The Header now renders `target="_blank" rel="noopener noreferrer"` on any absolute (`http…`) nav URL, and the header "Join" button links to the Softr registration app instead of `#join`.
 
 ###### History
+* External Registration Link (Softr) completed.
 * Mobile Navigation Menu completed.
 * Footer BLP Logo & Attribution completed.
 * Homepage CTA Layout Variants completed.
