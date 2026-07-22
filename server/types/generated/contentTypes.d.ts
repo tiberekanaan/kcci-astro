@@ -639,6 +639,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.resources-list',
         'blocks.press-releases-list',
         'blocks.events-list',
+        'blocks.contact',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;

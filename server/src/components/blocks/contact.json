@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_blocks_contacts",
+  "info": {
+    "displayName": "Contact",
+    "icon": "phone"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "address": {
+      "type": "text"
+    },
+    "officeHours": {
+      "type": "string"
+    },
+    "mapEmbedUrl": {
+      "type": "text"
+    }
+  }
+}

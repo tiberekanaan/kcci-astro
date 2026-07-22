@@ -1033,6 +1033,101 @@ async function seedEventsPage(strapi: Core.Strapi) {
   strapi.log.info('[seed] Added the Events List block to "events".');
 }
 
+// Seeded contact details for the /contact page — placeholders the client
+// replaces with the Chamber's real phone/address in the Strapi admin.
+const CONTACT_PAGE_CONTENT = [
+  {
+    __component: 'blocks.rich-text' as const,
+    body: '# Contact Us\n\nGet in touch with the KCCI secretariat — we welcome enquiries from members, prospective members, partners and the media.',
+  },
+  {
+    __component: 'blocks.contact' as const,
+    title: 'Get in Touch',
+    phone: '+686 75026572',
+    email: 'secretariat@kcci.org.ki',
+    address: 'KCCI Office, Betio\nSouth Tarawa\nRepublic of Kiribati',
+    officeHours: 'Monday – Friday, 9:00 am – 4:30 pm',
+    mapEmbedUrl: 'https://maps.google.com/maps?q=Betio,%20Tarawa,%20Kiribati&z=14&output=embed',
+  },
+];
+
+// Wire the /contact page: create it if missing, and add its Contact block
+// unless the client has already customised the page content.
+async function seedContactPage(strapi: Core.Strapi) {
+  const page = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'contact' },
+    populate: { content: { populate: '*' } },
+  });
+
+  if (!page) {
+    await strapi.documents(PAGE_UID).create({
+      data: { title: 'Contact', slug: 'contact', content: CONTACT_PAGE_CONTENT },
+      status: 'published',
+    });
+    strapi.log.info('[seed] Created the "contact" page with a Contact block.');
+    return;
+  }
+
+  const existingContent = page.content ?? [];
+  if (existingContent.some((block) => block.__component === 'blocks.contact')) return;
+
+  const onlyPlaceholders = existingContent.every(
+    (block) =>
+      block.__component === 'blocks.rich-text' && (block.body ?? '').includes('Placeholder content'),
+  );
+  if (!onlyPlaceholders) {
+    strapi.log.warn('[seed] Page "contact" has custom content; add the Contact block manually.');
+    return;
+  }
+
+  await strapi.documents(PAGE_UID).update({
+    documentId: page.documentId,
+    data: { content: CONTACT_PAGE_CONTENT },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Added the Contact block to "contact".');
+}
+
+// Point the nav at the /contact page: repoint a legacy "#contact" anchor link
+// (and drop duplicates), or append a flat link when absent.
+async function seedContactNav(strapi: Core.Strapi) {
+  const global = await strapi.documents(GLOBAL_UID).findFirst({
+    populate: { navLinks: { populate: '*' } },
+  });
+  if (!global) return;
+
+  const navLinks = global.navLinks ?? [];
+  const isContactLink = (group: (typeof navLinks)[number]) =>
+    group.url === '/contact' || group.url === '#contact' || /^contact( us)?$/i.test(group.label ?? '');
+  const firstIndex = navLinks.findIndex(isContactLink);
+  const desired = { label: 'Contact', url: '/contact', links: [] };
+
+  const upToDate =
+    firstIndex !== -1 &&
+    navLinks.filter(isContactLink).length === 1 &&
+    navLinks[firstIndex].label === desired.label &&
+    navLinks[firstIndex].url === desired.url;
+  if (upToDate) return;
+
+  // Components must be re-sent in full (without ids) when updating.
+  const kept = navLinks.filter((group, i) => !isContactLink(group) || i === firstIndex);
+  const rebuilt = kept.map((group) => ({
+    label: group.label,
+    url: group.url,
+    links: (group.links ?? []).map((link) => ({ label: link.label, url: link.url })),
+  }));
+  const contactIndex = kept.findIndex(isContactLink);
+  if (contactIndex === -1) rebuilt.push(desired);
+  else rebuilt[contactIndex] = desired;
+
+  await strapi.documents(GLOBAL_UID).update({
+    documentId: global.documentId,
+    data: { navLinks: rebuilt },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Wired the "Contact" nav link.');
+}
+
 async function seedMemberGrids(strapi: Core.Strapi) {
   for (const def of MEMBER_PAGES) {
     const page = await strapi.documents(PAGE_UID).findFirst({
@@ -1104,5 +1199,7 @@ export default {
     await seedDummyEvents(strapi);
     await seedEventsPage(strapi);
     await seedPublicEventPermissions(strapi);
+    await seedContactPage(strapi);
+    await seedContactNav(strapi);
   },
 };

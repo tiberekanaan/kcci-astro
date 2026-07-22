@@ -32,7 +32,8 @@
         "blocks.members-grid",
         "blocks.resources-list",
         "blocks.press-releases-list",
-        "blocks.events-list"
+        "blocks.events-list",
+        "blocks.contact"
       ]
     }
   }

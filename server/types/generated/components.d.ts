@@ -13,6 +13,22 @@ export interface BlocksAboutSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksContact extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_contacts';
+  info: {
+    displayName: 'Contact';
+    icon: 'phone';
+  };
+  attributes: {
+    address: Schema.Attribute.Text;
+    email: Schema.Attribute.Email;
+    mapEmbedUrl: Schema.Attribute.Text;
+    officeHours: Schema.Attribute.String;
+    phone: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksCta extends Struct.ComponentSchema {
   collectionName: 'components_blocks_ctas';
   info: {
@@ -203,6 +219,7 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'blocks.about-section': BlocksAboutSection;
+      'blocks.contact': BlocksContact;
       'blocks.cta': BlocksCta;
       'blocks.events-list': BlocksEventsList;
       'blocks.hero': BlocksHero;

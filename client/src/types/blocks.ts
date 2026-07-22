@@ -157,6 +157,17 @@ export interface EventsListBlock {
 	title: string | null;
 }
 
+export interface ContactBlock {
+	__component: 'blocks.contact';
+	id: number;
+	title: string | null;
+	phone: string | null;
+	email: string | null;
+	address: string | null;
+	officeHours: string | null;
+	mapEmbedUrl: string | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -173,7 +184,8 @@ export type Block =
 	| MembersGridBlock
 	| ResourcesListBlock
 	| PressReleasesListBlock
-	| EventsListBlock;
+	| EventsListBlock
+	| ContactBlock;
 
 export interface GlobalData {
 	siteName: string | null;
