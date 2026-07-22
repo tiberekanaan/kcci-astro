@@ -58,6 +58,18 @@ export interface BlocksMembersGrid extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksPressReleasesList extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_press_releases_lists';
+  info: {
+    description: 'Card grid of press releases with category and search filtering.';
+    displayName: 'Press Releases List';
+    icon: 'feather';
+  };
+  attributes: {
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksResourcesList extends Struct.ComponentSchema {
   collectionName: 'components_blocks_resources_lists';
   info: {
@@ -182,6 +194,7 @@ declare module '@strapi/strapi' {
       'blocks.cta': BlocksCta;
       'blocks.hero': BlocksHero;
       'blocks.members-grid': BlocksMembersGrid;
+      'blocks.press-releases-list': BlocksPressReleasesList;
       'blocks.resources-list': BlocksResourcesList;
       'blocks.rich-text': BlocksRichText;
       'blocks.services-grid': BlocksServicesGrid;

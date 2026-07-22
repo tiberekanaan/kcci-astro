@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Resources Document List
+**Feature:** Press Release Page
 
 ###### Status
-In progress — Resources from the `Resource` collection render via the `blocks.resources-list` dynamic-zone block: title, description, type badge, file ext/size, View/Download buttons (uploaded file or external link), and a client-side search filter. Required `category` enum (`regulations` / `internal` / `external`, default `internal`); the block's optional `category` field narrows a page to one category. Single-category pages paginate client-side (5/10/20 per page selector, numbered pager with Prev/Next, hidden when one page; search composes with pagination and resets to page 1). Seeded pages: `/resources` (all categories, grouped with headings) plus `/internal-resources`, `/external-resources`, `/regulations-and-acts` (single category, no group headings); the "Resources" nav item is a dropdown linking the three category pages. Seed generates and uploads real dummy PDFs (idempotent per title), migrates legacy/null categories (`toolkits` → `external`), grants Public read on Resource, and creates/wires pages only when missing or placeholder-only.
+Completed — Press releases from the `Press Release` collection (extended with a required `category` enum `news` / `announcement` / `event`, default `news`, and a `coverImage` media field) render on `/press-releases` via a new `blocks.press-releases-list` dynamic-zone block as cards showing cover image (gradient fallback), category badge, date, title and excerpt. Each card links to an SSR detail page `/press-releases/[slug]` showing breadcrumb (Home › Press Releases › Title), category, date, cover image and rich-text content; a reusable `Breadcrumb.astro` component was added. The listing has a client-side filter: category pills (All / News / Announcements / Events) composed with a text search over title + excerpt. Seed creates 10 dummy press releases with generated SVG cover images (idempotent per title), grants Public find/findOne on Press Release, creates the `/press-releases` page (only when missing or placeholder-only) and appends a "Press Releases" nav link when absent.
 
 ###### History
+* Resources Document List completed.
 * Member Manual Ordering completed.
 * Member Profiles (Board & Executive) completed.
 * Nav Dropdown Groups completed.

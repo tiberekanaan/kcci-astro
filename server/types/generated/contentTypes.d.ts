@@ -637,6 +637,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.rich-text',
         'blocks.members-grid',
         'blocks.resources-list',
+        'blocks.press-releases-list',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -667,7 +668,11 @@ export interface ApiPressReleasePressRelease
     draftAndPublish: true;
   };
   attributes: {
+    category: Schema.Attribute.Enumeration<['news', 'announcement', 'event']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'news'>;
     content: Schema.Attribute.RichText;
+    coverImage: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

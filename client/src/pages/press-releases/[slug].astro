@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
+import { renderMarkdown } from '../../lib/markdown';
+import type { PressRelease } from '../../types/blocks';
+
+// SSR: press releases are edited in Strapi, so the detail page always
+// reflects the latest published content, matched by slug.
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+const releases = slug
+	? await fetchStrapi<PressRelease[]>(
+			`/api/press-releases?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=coverImage`,
+		)
+	: null;
+const release = releases?.[0];
+
+if (!release) {
+	return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+	news: 'News',
+	announcement: 'Announcement',
+	event: 'Event',
+};
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const formattedDate = release.date ? dateFormatter.format(new Date(release.date)) : null;
+const imageUrl = mediaUrl(release.coverImage?.url);
+---
+
+<Layout title={release.title ?? 'Press Release'}>
+	<article class="mx-auto max-w-3xl px-6 py-12">
+		<Breadcrumb
+			items={[
+				{ label: 'Home', href: '/' },
+				{ label: 'Press Releases', href: '/press-releases' },
+				{ label: release.title ?? 'Press Release' },
+			]}
+		/>
+
+		<header class="mt-8">
+			<p class="flex items-center gap-2 text-sm text-muted-foreground">
+				<span class="rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary">
+					{CATEGORY_LABELS[release.category ?? 'news'] ?? 'News'}
+				</span>
+				{formattedDate && <time datetime={release.date ?? undefined}>{formattedDate}</time>}
+			</p>
+			<h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{release.title}</h1>
+			{release.excerpt && <p class="mt-4 text-lg text-muted-foreground">{release.excerpt}</p>}
+		</header>
+
+		{
+			imageUrl && (
+				<img
+					src={imageUrl}
+					alt={release.coverImage?.alternativeText ?? release.title ?? ''}
+					class="mt-8 aspect-[16/9] w-full rounded-2xl border border-muted object-cover"
+				/>
+			)
+		}
+
+		{
+			release.content && (
+				<div class="prose mt-10 max-w-none" set:html={renderMarkdown(release.content)} />
+			)
+		}
+	</article>
+</Layout>

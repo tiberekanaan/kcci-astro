@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blocks_press_releases_lists",
+  "info": {
+    "displayName": "Press Releases List",
+    "description": "Card grid of press releases with category and search filtering.",
+    "icon": "feather"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    }
+  }
+}

@@ -28,6 +28,23 @@
     },
     "content": {
       "type": "richtext"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "news",
+        "announcement",
+        "event"
+      ],
+      "default": "news",
+      "required": true
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

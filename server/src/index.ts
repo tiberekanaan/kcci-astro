@@ -6,6 +6,7 @@ import { join } from 'node:path';
 const MEMBER_UID = 'api::executive-member.executive-member';
 const PAGE_UID = 'api::page.page';
 const RESOURCE_UID = 'api::resource.resource';
+const PRESS_UID = 'api::press-release.press-release';
 const GLOBAL_UID = 'api::global.global';
 
 // Dummy member profiles seeded once (only when the collection is empty) so
@@ -492,6 +493,360 @@ async function seedResourcesNav(strapi: Core.Strapi) {
   strapi.log.info('[seed] Converted the "Resources" nav link into a dropdown.');
 }
 
+// Dummy press releases seeded idempotently per title. Each gets a generated
+// SVG cover image uploaded to the media library so the cards render with real
+// images out of the box.
+const DUMMY_PRESS_RELEASES = [
+  {
+    title: 'KCCI Launches 2026 Small Business Grant Programme',
+    slug: 'kcci-launches-2026-small-business-grant-programme',
+    date: '2026-07-02T09:00:00.000Z',
+    category: 'announcement',
+    excerpt:
+      'Grants of up to AUD 5,000 are now open to member businesses looking to expand operations, upgrade equipment or enter new markets.',
+    content:
+      'The Kiribati Chamber of Commerce & Industry today opened applications for its 2026 Small Business Grant Programme, offering grants of up to AUD 5,000 for member businesses across Kiribati.\n\nThe programme prioritises outer-island enterprises, women-led businesses and ventures in fisheries, agriculture and tourism. Funds may be used for equipment, training, certification or market development.\n\n## How to apply\n\nApplications close on 31 August 2026. Members can collect an application form from the KCCI office in Betio or request one by email. A short business plan and a quotation for the proposed expenditure are required.',
+  },
+  {
+    title: 'Chamber Signs MOU with Fiji Commerce & Employers Federation',
+    slug: 'chamber-signs-mou-with-fiji-commerce-employers-federation',
+    date: '2026-06-18T09:00:00.000Z',
+    category: 'news',
+    excerpt:
+      'The partnership opens trade-mission exchanges, shared training programmes and market-access support for members in both countries.',
+    content:
+      'KCCI has signed a Memorandum of Understanding with the Fiji Commerce & Employers Federation (FCEF), formalising a partnership between the two national business organisations.\n\nUnder the MOU, the chambers will run reciprocal trade missions, share training resources and support members seeking to enter each other’s markets. The first joint activity — a Suva trade mission for Kiribati exporters — is planned for late 2026.\n\n“Regional partnerships like this one give our members practical pathways to new customers,” said the KCCI Chief Executive Officer at the signing ceremony.',
+  },
+  {
+    title: 'Kiribati Trade Expo 2026 Dates Announced',
+    slug: 'kiribati-trade-expo-2026-dates-announced',
+    date: '2026-06-05T09:00:00.000Z',
+    category: 'event',
+    excerpt:
+      'The national trade expo returns to Bairiki Square on 12–14 November 2026, with exhibitor registrations opening in July.',
+    content:
+      'The Kiribati Trade Expo will return to Bairiki Square from 12 to 14 November 2026, KCCI announced today.\n\nNow in its fourth edition, the expo showcases local producers, handicraft exporters, fisheries businesses and service providers to buyers, development partners and the public. Last year’s event attracted more than 80 exhibitors and 4,000 visitors.\n\nExhibitor registrations open in July. KCCI members receive discounted booth rates, and a limited number of subsidised booths are reserved for outer-island producers.',
+  },
+  {
+    title: 'KCCI Welcomes New Board of Directors',
+    slug: 'kcci-welcomes-new-board-of-directors',
+    date: '2026-05-21T09:00:00.000Z',
+    category: 'announcement',
+    excerpt:
+      'Members elected the 2026–2028 Board at the Annual General Meeting, returning Taneti Baraniko as Board Chair.',
+    content:
+      'The Chamber’s membership has elected a new Board of Directors for the 2026–2028 term at the Annual General Meeting held in Betio.\n\nTaneti Baraniko was returned as Board Chair, with Ruta Tekanene elected Deputy Chair. The ten-member board brings together representatives from fisheries, tourism, construction, retail, transport, agriculture and financial services.\n\nThe new board’s priorities include the national trade policy consultation, expansion of member training services and stronger outer-island representation.',
+  },
+  {
+    title: 'Private Sector Consultation on National Trade Policy',
+    slug: 'private-sector-consultation-on-national-trade-policy',
+    date: '2026-04-30T09:00:00.000Z',
+    category: 'news',
+    excerpt:
+      'KCCI submitted a consolidated private-sector position paper to the Ministry of Commerce as part of the national trade policy review.',
+    content:
+      'KCCI has submitted a consolidated private-sector position paper to the Ministry of Commerce, Industry and Cooperatives as part of the review of the national trade policy framework.\n\nThe paper draws on consultations with more than 60 member businesses across South Tarawa and the outer islands. Key recommendations cover streamlined import licensing, improved inter-island shipping schedules and targeted support for export-ready producers.\n\nThe Chamber thanked members for their contributions and will publish the full paper in the resources section once the ministry’s review concludes.',
+  },
+  {
+    title: 'Women in Business Mentorship Programme Graduates First Cohort',
+    slug: 'women-in-business-mentorship-programme-graduates-first-cohort',
+    date: '2026-04-09T09:00:00.000Z',
+    category: 'news',
+    excerpt:
+      'Eighteen women entrepreneurs completed the six-month mentorship programme, with a second cohort opening later this year.',
+    content:
+      'Eighteen women entrepreneurs graduated from the Chamber’s inaugural Women in Business Mentorship Programme at a ceremony in Betio this week.\n\nOver six months, participants were paired with experienced business mentors and completed workshops on financial management, pricing, digital marketing and accessing finance. Graduates run businesses ranging from handicraft exports to catering, retail and tourism services.\n\nApplications for the second cohort will open later in 2026. The programme is delivered with the support of development partners and the Director for Women in Business, Arawaia Ioane.',
+  },
+  {
+    title: 'KCCI Annual General Meeting 2026 — Notice to Members',
+    slug: 'kcci-annual-general-meeting-2026-notice-to-members',
+    date: '2026-03-19T09:00:00.000Z',
+    category: 'announcement',
+    excerpt:
+      'The 2026 AGM will be held on 15 May at the Otintaai Hotel, Bikenibeu. Financial members are entitled to vote on board elections.',
+    content:
+      'Notice is hereby given that the Annual General Meeting of the Kiribati Chamber of Commerce & Industry will be held on Friday 15 May 2026 at the Otintaai Hotel, Bikenibeu, commencing at 2:00 pm.\n\nThe agenda includes the annual report, audited financial statements, election of the 2026–2028 Board of Directors and proposed amendments to the membership by-laws.\n\nOnly financial members are entitled to vote. Members wishing to stand for the board must lodge nominations with the secretariat by 1 May 2026.',
+  },
+  {
+    title: 'Digital Skills Training Workshop for SMEs',
+    slug: 'digital-skills-training-workshop-for-smes',
+    date: '2026-02-26T09:00:00.000Z',
+    category: 'event',
+    excerpt:
+      'A free two-day workshop covering online payments, social-media marketing and basic bookkeeping software runs 24–25 March.',
+    content:
+      'KCCI will host a free two-day Digital Skills Training Workshop for small and medium enterprises on 24–25 March 2026 at the Chamber office in Betio.\n\nSessions cover setting up online payments, marketing a business on social media, and using free bookkeeping software. Participants should bring a smartphone or laptop; a limited number of devices will be available on the day.\n\nPlaces are limited to 30 participants and members receive priority. Register with the secretariat by 18 March.',
+  },
+  {
+    title: 'Chamber Responds to New Import Levy Proposal',
+    slug: 'chamber-responds-to-new-import-levy-proposal',
+    date: '2026-02-05T09:00:00.000Z',
+    category: 'news',
+    excerpt:
+      'KCCI has asked government to phase in the proposed levy over two years and exempt essential business inputs.',
+    content:
+      'Responding to the proposed import levy announced in the national budget, KCCI has urged government to phase in the measure over two years and to exempt essential business inputs such as fuel, building materials and fishing equipment.\n\nIn its submission, the Chamber acknowledged the revenue objectives of the levy but warned that an immediate, across-the-board introduction would raise costs sharply for retailers and outer-island consumers.\n\nKCCI has requested a joint working group with the Ministry of Finance and Economic Development to review the levy schedule before it takes effect.',
+  },
+  {
+    title: 'KCCI and MFED Host Business Licensing Forum',
+    slug: 'kcci-and-mfed-host-business-licensing-forum',
+    date: '2026-01-15T09:00:00.000Z',
+    category: 'event',
+    excerpt:
+      'Over 50 business owners joined the forum on licensing reform, with government committing to a simplified renewal process.',
+    content:
+      'More than 50 business owners attended a joint KCCI–Ministry of Finance and Economic Development forum on business licensing reform held at the Parliament conference room in Ambo.\n\nParticipants raised concerns about renewal delays, inconsistent fees between councils and the lack of an online application option. Officials committed to piloting a simplified renewal process in South Tarawa during 2026.\n\nThe Chamber will circulate the forum outcomes to members and monitor progress on the commitments made.',
+  },
+] as const;
+
+// Palette pairs (dark gradient stops) rotated across the generated covers.
+const COVER_PALETTES = [
+  ['#1b7a43', '#0e4d2a'],
+  ['#b98a2f', '#7a5a1d'],
+  ['#20707a', '#123f45'],
+  ['#4a5d8a', '#2b3a5e'],
+] as const;
+
+// Build a simple branded SVG cover (gradient, KCCI wordmark, category label,
+// wrapped title) so seeded press releases ship with a real cover image.
+function makeCoverSvg(title: string, category: string, index: number): Buffer {
+  const escapeXml = (text: string) =>
+    text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const lines: string[] = [];
+  let line = '';
+  for (const word of title.split(' ')) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length > 26 && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  const shown = lines.slice(0, 3);
+  if (lines.length > 3) shown[2] += '…';
+
+  const [from, to] = COVER_PALETTES[index % COVER_PALETTES.length];
+  const titleText = shown
+    .map(
+      (text, i) =>
+        `<text x="80" y="${430 + i * 74}" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="#ffffff">${escapeXml(text)}</text>`,
+    )
+    .join('\n  ');
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${from}"/>
+      <stop offset="1" stop-color="${to}"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <circle cx="1050" cy="110" r="230" fill="#ffffff" opacity="0.08"/>
+  <circle cx="140" cy="690" r="260" fill="#ffffff" opacity="0.06"/>
+  <text x="80" y="140" font-family="Verdana, sans-serif" font-size="30" font-weight="bold" letter-spacing="6" fill="#ffffff" opacity="0.9">KCCI</text>
+  <text x="80" y="330" font-family="Verdana, sans-serif" font-size="24" letter-spacing="4" fill="#ffffff" opacity="0.75">PRESS RELEASE · ${escapeXml(category.toUpperCase())}</text>
+  ${titleText}
+</svg>
+`;
+  return Buffer.from(svg, 'utf8');
+}
+
+async function seedDummyPressReleases(strapi: Core.Strapi) {
+  const tmpDir = await mkdtemp(join(tmpdir(), 'kcci-seed-press-'));
+  let created = 0;
+  try {
+    for (const [index, release] of DUMMY_PRESS_RELEASES.entries()) {
+      // Idempotent per title so dummy items slot in next to any real press
+      // releases the client has already added.
+      const existing = await strapi.documents(PRESS_UID).findFirst({
+        filters: { title: release.title },
+      });
+      if (existing) continue;
+
+      const svg = makeCoverSvg(release.title, release.category, index);
+      const fileName = `${release.slug}.svg`;
+      const filePath = join(tmpDir, fileName);
+      await writeFile(filePath, svg);
+
+      const [uploaded] = await strapi
+        .plugin('upload')
+        .service('upload')
+        .upload({
+          data: { fileInfo: { name: release.title, caption: null, alternativeText: release.title } },
+          files: {
+            filepath: filePath,
+            originalFilename: fileName,
+            mimetype: 'image/svg+xml',
+            size: svg.length,
+          },
+        });
+
+      await strapi.documents(PRESS_UID).create({
+        data: {
+          title: release.title,
+          slug: release.slug,
+          date: release.date,
+          excerpt: release.excerpt,
+          content: release.content,
+          category: release.category,
+          ...(uploaded?.id ? { coverImage: uploaded.id } : {}),
+        },
+        status: 'published',
+      });
+      created += 1;
+    }
+    if (created > 0) strapi.log.info(`[seed] Created ${created} dummy press releases.`);
+  } finally {
+    await rm(tmpDir, { recursive: true, force: true });
+  }
+}
+
+// Grant the Public role read access to press releases so the frontend can
+// list and open them anonymously.
+async function seedPublicPressReleasePermissions(strapi: Core.Strapi) {
+  const publicRole = await strapi.db
+    .query('plugin::users-permissions.role')
+    .findOne({ where: { type: 'public' } });
+  if (!publicRole) return;
+
+  const actions = [
+    'api::press-release.press-release.find',
+    'api::press-release.press-release.findOne',
+  ];
+  for (const action of actions) {
+    const existing = await strapi.db
+      .query('plugin::users-permissions.permission')
+      .findOne({ where: { action, role: publicRole.id } });
+    if (existing) continue;
+
+    await strapi.db
+      .query('plugin::users-permissions.permission')
+      .create({ data: { action, role: publicRole.id } });
+    strapi.log.info(`[seed] Granted public permission "${action}".`);
+  }
+}
+
+// Wire the /press-releases page: create it if missing, and add its Press
+// Releases List block unless the client has already customised the content.
+async function seedPressReleasePage(strapi: Core.Strapi) {
+  const content = [
+    {
+      __component: 'blocks.rich-text' as const,
+      body: '# Press Releases\n\nNews, announcements and events from the Kiribati Chamber of Commerce & Industry.',
+    },
+    { __component: 'blocks.press-releases-list' as const, title: null },
+  ];
+
+  const isPlaceholderOnly = (blocks: { __component: string; body?: string | null }[]) =>
+    blocks.every(
+      (block) =>
+        block.__component === 'blocks.rich-text' &&
+        (block.body ?? '').includes('Placeholder content'),
+    );
+
+  const page = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'press-releases' },
+    populate: { content: { populate: '*' } },
+  });
+
+  // The sub-pages seed originally shipped a singular "press-release"
+  // placeholder page; migrate it to the plural slug used by the listing and
+  // detail routes (or retire it once the plural page exists).
+  const legacy = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'press-release' },
+    populate: { content: { populate: '*' } },
+  });
+  const legacyPlaceholder = legacy && isPlaceholderOnly(legacy.content ?? []);
+
+  if (!page && legacyPlaceholder) {
+    await strapi.documents(PAGE_UID).update({
+      documentId: legacy.documentId,
+      data: { title: 'Press Releases', slug: 'press-releases', content },
+      status: 'published',
+    });
+    strapi.log.info('[seed] Migrated the "press-release" placeholder page to "press-releases".');
+    return;
+  }
+
+  if (page && legacyPlaceholder) {
+    await strapi.documents(PAGE_UID).delete({ documentId: legacy.documentId });
+    strapi.log.info('[seed] Removed the redundant "press-release" placeholder page.');
+  } else if (legacy && !legacyPlaceholder) {
+    strapi.log.warn('[seed] Page "press-release" has custom content; review it manually.');
+  }
+
+  if (!page) {
+    await strapi.documents(PAGE_UID).create({
+      data: { title: 'Press Releases', slug: 'press-releases', content },
+      status: 'published',
+    });
+    strapi.log.info('[seed] Created the "press-releases" page with a Press Releases List block.');
+    return;
+  }
+
+  const existingContent = page.content ?? [];
+  if (existingContent.some((block) => block.__component === 'blocks.press-releases-list')) return;
+
+  if (!isPlaceholderOnly(existingContent)) {
+    strapi.log.warn(
+      '[seed] Page "press-releases" has custom content; add the Press Releases List block manually.',
+    );
+    return;
+  }
+
+  await strapi.documents(PAGE_UID).update({
+    documentId: page.documentId,
+    data: { content },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Added the Press Releases List block to "press-releases".');
+}
+
+// Point the nav at the /press-releases page: repoint a legacy "Press
+// Release" link (and drop duplicates), or append a flat link when absent.
+async function seedPressReleaseNav(strapi: Core.Strapi) {
+  const global = await strapi.documents(GLOBAL_UID).findFirst({
+    populate: { navLinks: { populate: '*' } },
+  });
+  if (!global) return;
+
+  const navLinks = global.navLinks ?? [];
+  const isPressLink = (group: (typeof navLinks)[number]) =>
+    group.url === '/press-release' ||
+    group.url === '/press-releases' ||
+    /^press releases?$/i.test(group.label ?? '');
+  const firstIndex = navLinks.findIndex(isPressLink);
+  const desired = { label: 'Press Releases', url: '/press-releases', links: [] };
+
+  const upToDate =
+    firstIndex !== -1 &&
+    navLinks.filter(isPressLink).length === 1 &&
+    navLinks[firstIndex].label === desired.label &&
+    navLinks[firstIndex].url === desired.url;
+  if (upToDate) return;
+
+  // Components must be re-sent in full (without ids) when updating.
+  const kept = navLinks.filter((group, i) => !isPressLink(group) || i === firstIndex);
+  const rebuilt = kept.map((group) => ({
+    label: group.label,
+    url: group.url,
+    links: (group.links ?? []).map((link) => ({ label: link.label, url: link.url })),
+  }));
+  const pressIndex = kept.findIndex(isPressLink);
+  if (pressIndex === -1) rebuilt.push(desired);
+  else rebuilt[pressIndex] = desired;
+
+  await strapi.documents(GLOBAL_UID).update({
+    documentId: global.documentId,
+    data: { navLinks: rebuilt },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Wired the "Press Releases" nav link.');
+}
+
 async function seedMemberGrids(strapi: Core.Strapi) {
   for (const def of MEMBER_PAGES) {
     const page = await strapi.documents(PAGE_UID).findFirst({
@@ -556,5 +911,9 @@ export default {
     await seedResourcePages(strapi);
     await seedResourcesNav(strapi);
     await seedPublicResourcePermissions(strapi);
+    await seedDummyPressReleases(strapi);
+    await seedPressReleasePage(strapi);
+    await seedPressReleaseNav(strapi);
+    await seedPublicPressReleasePermissions(strapi);
   },
 };

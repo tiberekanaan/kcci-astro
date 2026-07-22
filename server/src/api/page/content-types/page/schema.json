@@ -30,7 +30,8 @@
         "blocks.cta",
         "blocks.rich-text",
         "blocks.members-grid",
-        "blocks.resources-list"
+        "blocks.resources-list",
+        "blocks.press-releases-list"
       ]
     }
   }

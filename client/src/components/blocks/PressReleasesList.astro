@@ -1,0 +1,204 @@
+---
+import type { PressRelease, PressReleasesListBlock } from '../../types/blocks';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
+
+type Props = PressReleasesListBlock;
+
+const { title } = Astro.props;
+
+// SSR: press releases are managed as a Strapi collection so the client can
+// add/edit/delete them without touching the page's dynamic zone.
+const releases =
+	(await fetchStrapi<PressRelease[]>(
+		'/api/press-releases?populate=coverImage&sort[0]=date:desc&pagination[pageSize]=100',
+	)) ?? [];
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+
+const CATEGORIES = [
+	{ key: 'news', label: 'News' },
+	{ key: 'announcement', label: 'Announcements' },
+	{ key: 'event', label: 'Events' },
+] as const;
+
+const categoryLabel = (key: string | null) =>
+	CATEGORIES.find((c) => c.key === key)?.label ?? 'News';
+
+const items = releases
+	.filter((release) => release.slug)
+	.map((release) => ({
+		...release,
+		url: `/press-releases/${release.slug}`,
+		imageUrl: mediaUrl(release.coverImage?.url),
+		formattedDate: release.date ? dateFormatter.format(new Date(release.date)) : null,
+	}));
+---
+
+<section class="py-20" data-press>
+	<div class="mx-auto max-w-6xl px-6">
+		{title && <h2 data-reveal class="mb-8 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+
+		<div data-reveal class="mb-12 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+			<div class="flex flex-wrap gap-2" role="group" aria-label="Filter press releases by category">
+				<button
+					type="button"
+					data-press-filter
+					data-category="all"
+					aria-pressed="true"
+					class="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300"
+				>
+					All
+				</button>
+				{
+					CATEGORIES.map((category) => (
+						<button
+							type="button"
+							data-press-filter
+							data-category={category.key}
+							aria-pressed="false"
+							class="rounded-full border border-muted px-4 py-2 text-sm font-semibold transition-all duration-300 hover:border-primary/40 hover:text-primary"
+						>
+							{category.label}
+						</button>
+					))
+				}
+			</div>
+			<label class="relative block lg:w-72">
+				<span class="sr-only">Search press releases</span>
+				<svg
+					class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<circle cx="11" cy="11" r="8" />
+					<path d="m21 21-4.3-4.3" />
+				</svg>
+				<input
+					type="search"
+					data-press-search
+					placeholder="Search press releases…"
+					class="w-full rounded-xl border border-muted bg-background py-3 pl-12 pr-4 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
+				/>
+			</label>
+		</div>
+
+		{
+			items.length === 0 ? (
+				<p class="text-center text-muted-foreground">Press releases are coming soon.</p>
+			) : (
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{items.map((item, i) => (
+						<a
+							href={item.url}
+							data-reveal
+							data-press-item
+							data-category={item.category ?? 'news'}
+							data-search={`${item.title ?? ''} ${item.excerpt ?? ''}`.toLowerCase()}
+							style={`--reveal-delay: ${i * 90}ms`}
+							class="group flex flex-col overflow-hidden rounded-2xl border border-muted bg-background transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+						>
+							{item.imageUrl ? (
+								<img
+									src={item.imageUrl}
+									alt={item.coverImage?.alternativeText ?? item.title ?? ''}
+									class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+									loading="lazy"
+								/>
+							) : (
+								<div
+									class="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10"
+									role="img"
+									aria-label={`Placeholder cover for ${item.title ?? 'press release'}`}
+								>
+									<svg class="h-12 w-12 text-primary/25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V9" />
+										<path d="M18 14h-8" />
+										<path d="M15 18h-5" />
+										<path d="M10 6h8v4h-8V6Z" />
+									</svg>
+								</div>
+							)}
+							<div class="flex flex-1 flex-col p-6">
+								<p class="flex items-center gap-2 text-xs text-muted-foreground">
+									<span class="rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary">
+										{categoryLabel(item.category)}
+									</span>
+									{item.formattedDate && <time datetime={item.date ?? undefined}>{item.formattedDate}</time>}
+								</p>
+								<h3 class="mt-3 text-lg font-semibold leading-snug transition-colors group-hover:text-primary">
+									{item.title}
+								</h3>
+								{item.excerpt && (
+									<p class="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">{item.excerpt}</p>
+								)}
+								<span class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+									Read more
+									<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M5 12h14" />
+										<path d="m12 5 7 7-7 7" />
+									</svg>
+								</span>
+							</div>
+						</a>
+					))}
+				</div>
+			)
+		}
+
+		<p data-press-empty hidden class="text-center text-muted-foreground">
+			No press releases match your filter.
+		</p>
+	</div>
+</section>
+
+<script>
+	// Client-side category + search filter. The two compose: a card must match
+	// the active category pill AND the search query. `style.display` is used
+	// for hiding: the `hidden` attribute would lose to the cards' `flex` class.
+	const PILL = 'rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ' as const;
+	const PILL_IDLE = `${PILL}border border-muted hover:border-primary/40 hover:text-primary`;
+	const PILL_ACTIVE = `${PILL}bg-primary text-white shadow-sm`;
+
+	for (const root of document.querySelectorAll('[data-press]')) {
+		const input = root.querySelector<HTMLInputElement>('[data-press-search]');
+		const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-press-filter]')];
+		const items = [...root.querySelectorAll<HTMLElement>('[data-press-item]')];
+		const empty = root.querySelector<HTMLElement>('[data-press-empty]');
+		if (!input || items.length === 0) continue;
+
+		let category = 'all';
+
+		const apply = () => {
+			const query = input.value.trim().toLowerCase();
+			let anyVisible = false;
+
+			for (const item of items) {
+				const matches =
+					(category === 'all' || item.dataset.category === category) &&
+					(!query || (item.dataset.search ?? '').includes(query));
+				item.style.display = matches ? '' : 'none';
+				anyVisible ||= matches;
+			}
+
+			if (empty) empty.hidden = anyVisible;
+		};
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				category = button.dataset.category ?? 'all';
+				for (const other of buttons) {
+					const active = other === button;
+					other.className = active ? PILL_ACTIVE : PILL_IDLE;
+					other.setAttribute('aria-pressed', String(active));
+				}
+				apply();
+			});
+		}
+		input.addEventListener('input', apply);
+	}
+</script>

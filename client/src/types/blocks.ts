@@ -121,6 +121,24 @@ export interface ResourcesListBlock {
 	category?: 'regulations' | 'internal' | 'external' | null;
 }
 
+export interface PressRelease {
+	id: number;
+	documentId: string;
+	title: string | null;
+	slug: string | null;
+	date: string | null;
+	excerpt: string | null;
+	content: string | null;
+	category: 'news' | 'announcement' | 'event' | null;
+	coverImage?: StrapiMedia | null;
+}
+
+export interface PressReleasesListBlock {
+	__component: 'blocks.press-releases-list';
+	id: number;
+	title: string | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -135,7 +153,8 @@ export type Block =
 	| CtaBlock
 	| RichTextBlock
 	| MembersGridBlock
-	| ResourcesListBlock;
+	| ResourcesListBlock
+	| PressReleasesListBlock;
 
 export interface GlobalData {
 	siteName: string | null;
