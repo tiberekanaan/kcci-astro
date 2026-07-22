@@ -1,7 +1,7 @@
 // Helpers for the SSR/native-fetch path against the Strapi 5 REST API.
 // (Build-time collections use the Content Loader in src/content.config.ts.)
 
-const STRAPI_BASE_URL = import.meta.env.STRAPI_BASE_URL ?? 'http://127.0.0.1:1337';
+const STRAPI_BASE_URL = import.meta.env.STRAPI_BASE_URL || 'http://127.0.0.1:1337';
 
 /**
  * Fetch a Strapi REST endpoint and return the flattened `data` payload.

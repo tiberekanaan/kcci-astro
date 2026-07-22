@@ -1420,6 +1420,39 @@ async function seedFooterAttribution(strapi: Core.Strapi) {
   strapi.log.info('[seed] Seeded footer BLP logo/attribution.');
 }
 
+// Public read access for the content types the Astro client fetches. These
+// were enabled by hand in the local admin, so fresh deployments (e.g. Strapi
+// Cloud) 403 without this seed. Resource/press-release/event grants live in
+// their own seeds above.
+async function seedPublicContentPermissions(strapi: Core.Strapi) {
+  const publicRole = await strapi.db
+    .query('plugin::users-permissions.role')
+    .findOne({ where: { type: 'public' } });
+  if (!publicRole) return;
+
+  const actions = [
+    'api::global.global.find',
+    'api::homepage.homepage.find',
+    'api::page.page.find',
+    'api::page.page.findOne',
+    'api::faq.faq.find',
+    'api::faq.faq.findOne',
+    'api::executive-member.executive-member.find',
+    'api::executive-member.executive-member.findOne',
+  ];
+  for (const action of actions) {
+    const existing = await strapi.db
+      .query('plugin::users-permissions.permission')
+      .findOne({ where: { action, role: publicRole.id } });
+    if (existing) continue;
+
+    await strapi.db
+      .query('plugin::users-permissions.permission')
+      .create({ data: { action, role: publicRole.id } });
+    strapi.log.info(`[seed] Granted public permission "${action}".`);
+  }
+}
+
 // Member registration lives in an external Softr app: repoint the nav
 // "Registration" link there and drop the placeholder /registration page.
 const REGISTRATION_URL = 'https://kcci.softr.app/registration';
@@ -1513,6 +1546,7 @@ export default {
     await seedPartnersNav(strapi);
     await backfillCtaVariants(strapi);
     await seedFooterAttribution(strapi);
+    await seedPublicContentPermissions(strapi);
     await seedRegistrationLink(strapi);
   },
 };

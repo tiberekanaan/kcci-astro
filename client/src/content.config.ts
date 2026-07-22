@@ -4,7 +4,7 @@ import { strapiLoader } from 'strapi-community-astro-loader';
 
 // Strapi v5 content API root. The @strapi/client expects the URL to
 // include the `/api` path segment.
-const baseURL = `${import.meta.env.STRAPI_BASE_URL}/api`;
+const baseURL = `${import.meta.env.STRAPI_BASE_URL || 'http://127.0.0.1:1337'}/api`;
 
 // Shared shape for Strapi media fields (e.g. member images).
 const strapiImage = z.object({
