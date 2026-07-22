@@ -1,10 +1,12 @@
 ###### Current Feature
-**Feature:** Homepage CTA Layout Variants
+**Feature:** Footer BLP Logo & Attribution
 
 ###### Status
-Completed — new `variant` enum (`split` | `spotlight` | `banner`, default `split`) on the `blocks.cta` component so the two homepage CTA sections stop rendering as identical mirrored split sections. `spotlight` renders the image with an overlapping white content card and gold accent bar (used by "Find a BLP Business Advisor"); `banner` renders a full-width photo with a green gradient overlay, centered headline and gold button as the page closer (used by "Ready to Join?", which now carries the `#join` anchor targeted by the header Join button). Existing/legacy CTA blocks keep the original `split` layout. One-time bootstrap backfill sets the two homepage CTAs' variants only while still `NULL`, so editor choices are never overwritten.
+Completed — new `footerLogo` (single image media) and `footerAttribution` (text) fields on the `Global` single type so the footer partner logo and its credit line are editable in Strapi instead of hard-coded. The footer renders the logo on a small white card in the branding column with the attribution text below it ("This website was developed in collaboration with Business Link Pacific, funded by The Ministry of Foreign Affairs New Zealand."). One-time bootstrap seed uploads `server/data/blp-logo.webp` and sets the attribution only while the fields are still `NULL`, so editor changes are never overwritten. The footer was restyled as a dark page-closer: deep palm-green gradient, golden accent line along the top edge, the BLP logo on a white rounded card, and a thin-bordered copyright strip.
 
 ###### History
+* Footer BLP Logo & Attribution completed.
+* Homepage CTA Layout Variants completed.
 * Our Partners Page completed.
 * Contact Page completed.
 * Events Page completed.

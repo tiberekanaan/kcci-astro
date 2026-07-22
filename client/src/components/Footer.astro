@@ -1,35 +1,58 @@
 ---
-import type { SharedLink } from '../types/blocks';
+import type { SharedLink, StrapiMedia } from '../types/blocks';
+import { mediaUrl } from '../lib/strapi';
 
 interface Props {
 	siteName?: string | null;
 	footerLinks?: SharedLink[] | null;
+	footerLogo?: StrapiMedia | null;
+	footerAttribution?: string | null;
 }
 
-const { siteName = 'KCCI Business Link', footerLinks } = Astro.props;
+const { siteName = 'KCCI Business Link', footerLinks, footerLogo, footerAttribution } = Astro.props;
 
 const links = footerLinks ?? [];
+const footerLogoUrl = mediaUrl(footerLogo?.url);
 ---
 
-<footer id="contact" class="bg-neutral-900 text-neutral-300">
-	<div class="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 md:grid-cols-3">
-		<div class="space-y-3">
-			<div class="flex items-center gap-2.5 font-bold text-white">
-				<span class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm shadow-sm">K</span>
-				<span>{siteName}</span>
-			</div>
-			<p class="text-sm text-neutral-400">
-				Representing and empowering the private sector to compete, grow and thrive.
-			</p>
+<footer
+	id="contact"
+	class="relative overflow-hidden text-emerald-50/80"
+	style="background-image: linear-gradient(180deg, #0c3b25, #071f14 75%);"
+>
+	<!-- Golden midrib accent line marking the end of the page. -->
+	<div class="h-1 w-full bg-gradient-to-r from-accent-dark via-accent to-accent-dark"></div>
+	<!-- Soft highlight so the dark surface doesn't read flat. -->
+	<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.07),transparent_55%)]"></div>
+
+	<div class="relative mx-auto grid max-w-6xl gap-12 px-6 py-16 md:grid-cols-3">
+		<div class="space-y-5">
+			{
+				footerLogoUrl && (
+					<div class="inline-block rounded-2xl bg-white p-4 shadow-lg shadow-black/30">
+						<img
+							src={footerLogoUrl}
+							alt={footerLogo?.alternativeText ?? 'Partner logo'}
+							class="h-20 w-auto"
+							loading="lazy"
+						/>
+					</div>
+				)
+			}
+			{footerAttribution && <p class="max-w-xs text-sm leading-relaxed text-emerald-50/70">{footerAttribution}</p>}
 		</div>
 		{
 			links.length > 0 && (
 				<div class="md:col-span-2">
-					<h3 class="mb-3 text-sm font-semibold text-white">Explore</h3>
-					<ul class="grid gap-2 text-sm text-neutral-400 sm:grid-cols-2">
+					<h3 class="mb-1 text-lg font-bold text-white">Explore</h3>
+					<div class="mb-5 h-0.5 w-10 rounded-full bg-accent" />
+					<ul class="grid gap-x-8 gap-y-2.5 text-sm sm:grid-cols-2">
 						{links.map((item) => (
 							<li>
-								<a href={item.url ?? '#'} class="transition-colors hover:text-accent">
+								<a
+									href={item.url ?? '#'}
+									class="text-emerald-50/70 transition-colors hover:text-accent"
+								>
 									{item.label}
 								</a>
 							</li>
@@ -39,7 +62,9 @@ const links = footerLinks ?? [];
 			)
 		}
 	</div>
-	<div class="border-t border-neutral-800 py-6 text-center text-xs text-neutral-500">
-		© {new Date().getFullYear()} {siteName}. All rights reserved.
+	<div class="relative border-t border-white/10">
+		<p class="mx-auto max-w-6xl px-6 py-5 text-xs text-emerald-50/50">
+			© {new Date().getFullYear()} │ {siteName}. All rights reserved.
+		</p>
 	</div>
 </footer>

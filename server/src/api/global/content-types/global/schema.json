@@ -36,6 +36,15 @@
       "type": "component",
       "repeatable": true,
       "component": "shared.link"
+    },
+    "footerLogo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "footerAttribution": {
+      "type": "text"
     }
   }
 }

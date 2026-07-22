@@ -15,7 +15,7 @@ const { title = 'KCCI' } = Astro.props;
 // manage them in Strapi. Falls back to null (sensible defaults) if Strapi
 // is unreachable.
 const global = await fetchStrapi<GlobalData>(
-	'/api/global?populate[logo]=true&populate[favicon]=true&populate[footerLinks]=true&populate[navLinks][populate]=links',
+	'/api/global?populate[logo]=true&populate[favicon]=true&populate[footerLinks]=true&populate[footerLogo]=true&populate[navLinks][populate]=links',
 );
 
 // Editor-uploaded favicon wins; the static /favicon.svg is the fallback.
@@ -46,7 +46,12 @@ const faviconType = faviconUrl?.endsWith('.svg') ? 'image/svg+xml' : undefined;
 		<div class="flex-1">
 			<slot />
 		</div>
-		<Footer siteName={global?.siteName} footerLinks={global?.footerLinks} />
+		<Footer
+			siteName={global?.siteName}
+			footerLinks={global?.footerLinks}
+			footerLogo={global?.footerLogo}
+			footerAttribution={global?.footerAttribution}
+		/>
 
 		<!-- Progressive scroll-reveal: lift + fade [data-reveal] elements in as
 		     they appear. Lives in the shared layout so every page gets it. -->

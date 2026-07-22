@@ -209,4 +209,6 @@ export interface GlobalData {
 	favicon?: StrapiMedia | null;
 	navLinks?: NavGroup[] | null;
 	footerLinks?: SharedLink[] | null;
+	footerLogo?: StrapiMedia | null;
+	footerAttribution?: string | null;
 }

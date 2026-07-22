@@ -1,5 +1,5 @@
 import type { Core } from '@strapi/strapi';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -1366,6 +1366,60 @@ async function backfillCtaVariants(strapi: Core.Strapi) {
   }
 }
 
+// One-time backfill for the footer partner block: uploads the BLP logo and
+// sets the attribution line only while the fields are still NULL, so editor
+// changes (including clearing/replacing the logo) are never overwritten.
+async function seedFooterAttribution(strapi: Core.Strapi) {
+  const global = await strapi.documents(GLOBAL_UID).findFirst({
+    populate: ['footerLogo'],
+  });
+  if (!global) return;
+
+  const data: Record<string, unknown> = {};
+
+  if (global.footerLogo == null) {
+    const filePath = join(process.cwd(), 'data', 'blp-logo.webp');
+    try {
+      const { size } = await stat(filePath);
+      const [uploaded] = await strapi
+        .plugin('upload')
+        .service('upload')
+        .upload({
+          data: {
+            fileInfo: {
+              name: 'Business Link Pacific logo',
+              caption: null,
+              alternativeText: 'Business Link Pacific',
+            },
+          },
+          files: {
+            filepath: filePath,
+            originalFilename: 'blp-logo.webp',
+            mimetype: 'image/webp',
+            size,
+          },
+        });
+      if (uploaded?.id) data.footerLogo = uploaded.id;
+    } catch (error) {
+      strapi.log.warn(`[seed] Could not upload footer logo: ${String(error)}`);
+    }
+  }
+
+  if (global.footerAttribution == null) {
+    data.footerAttribution =
+      'This website was developed in collaboration with Business Link Pacific, funded by The Ministry of Foreign Affairs New Zealand.';
+  }
+
+  if (Object.keys(data).length === 0) return;
+
+  await strapi.documents(GLOBAL_UID).update({
+    documentId: global.documentId,
+    data,
+    status: 'published',
+  });
+  strapi.log.info('[seed] Seeded footer BLP logo/attribution.');
+}
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -1403,5 +1457,6 @@ export default {
     await seedPartnersPage(strapi);
     await seedPartnersNav(strapi);
     await backfillCtaVariants(strapi);
+    await seedFooterAttribution(strapi);
   },
 };
