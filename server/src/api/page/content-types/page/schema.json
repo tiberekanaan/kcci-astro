@@ -31,7 +31,8 @@
         "blocks.rich-text",
         "blocks.members-grid",
         "blocks.resources-list",
-        "blocks.press-releases-list"
+        "blocks.press-releases-list",
+        "blocks.events-list"
       ]
     }
   }

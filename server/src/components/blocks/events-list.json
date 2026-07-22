@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blocks_events_lists",
+  "info": {
+    "displayName": "Events List",
+    "description": "Card grid of events with upcoming/past and search filtering.",
+    "icon": "calendar"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    }
+  }
+}

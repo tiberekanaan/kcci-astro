@@ -1,45 +1,93 @@
 ---
-import { getCollection } from 'astro:content';
-import type { GetStaticPaths } from 'astro';
 import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
 import { renderMarkdown } from '../../lib/markdown';
+import type { EventItem } from '../../types/blocks';
 
-export const getStaticPaths = (async () => {
-	const events = await getCollection('events');
+// SSR: events are edited in Strapi, so the detail page always reflects the
+// latest published content, matched by slug.
+export const prerender = false;
 
-	return events.map((event) => ({
-		params: { slug: event.data.slug },
-		props: { event },
-	}));
-}) satisfies GetStaticPaths;
+const { slug } = Astro.params;
 
-const { event } = Astro.props;
+const events = slug
+	? await fetchStrapi<EventItem[]>(
+			`/api/events?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=image`,
+		)
+	: null;
+const event = events?.[0];
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-	dateStyle: 'long',
-});
+if (!event) {
+	return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
+const upcoming = event.date ? new Date(event.date).getTime() >= Date.now() : false;
+const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const formattedDate = event.date ? dateFormatter.format(new Date(event.date)) : null;
+const imageUrl = mediaUrl(event.image?.url);
 ---
 
-<Layout title={event.data.title}>
-	<main class="mx-auto max-w-3xl px-6 py-12 space-y-6">
-		<a href="/" class="text-sm text-primary hover:underline">&larr; Back to home</a>
+<Layout title={event.title ?? 'Event'}>
+	<article class="mx-auto max-w-3xl px-6 py-12">
+		<Breadcrumb
+			items={[
+				{ label: 'Home', href: '/' },
+				{ label: 'Events', href: '/events' },
+				{ label: event.title ?? 'Event' },
+			]}
+		/>
 
-		<header class="space-y-2">
-			<h1 class="text-3xl font-bold text-primary">{event.data.title}</h1>
-			<div class="space-y-1 text-foreground/70">
-				{
-					event.data.date && (
-						<p>{dateFormatter.format(new Date(event.data.date))}</p>
-					)
-				}
-				{event.data.location && <p>{event.data.location}</p>}
-			</div>
+		<header class="mt-8">
+			<p class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+				<span
+					class={
+						upcoming
+							? 'rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary'
+							: 'rounded-full bg-muted px-2.5 py-0.5 font-medium'
+					}
+				>
+					{upcoming ? 'Upcoming' : 'Past'}
+				</span>
+				{formattedDate && <time datetime={event.date ?? undefined}>{formattedDate}</time>}
+			</p>
+			<h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{event.title}</h1>
+			{
+				event.location && (
+					<p class="mt-3 flex items-center gap-1.5 text-muted-foreground">
+						<svg
+							class="h-5 w-5 shrink-0"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+							<circle cx="12" cy="10" r="3" />
+						</svg>
+						{event.location}
+					</p>
+				)
+			}
 		</header>
 
 		{
-			event.data.description && (
-				<div class="prose max-w-none" set:html={renderMarkdown(event.data.description)} />
+			imageUrl && (
+				<img
+					src={imageUrl}
+					alt={event.image?.alternativeText ?? event.title ?? ''}
+					class="mt-8 aspect-[16/9] w-full rounded-2xl border border-muted object-cover"
+				/>
 			)
 		}
-	</main>
+
+		{
+			event.description && (
+				<div class="prose mt-10 max-w-none" set:html={renderMarkdown(event.description)} />
+			)
+		}
+	</article>
 </Layout>

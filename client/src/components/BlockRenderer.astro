@@ -9,6 +9,7 @@ import RichText from './blocks/RichText.astro';
 import MembersGrid from './blocks/MembersGrid.astro';
 import ResourcesList from './blocks/ResourcesList.astro';
 import PressReleasesList from './blocks/PressReleasesList.astro';
+import EventsList from './blocks/EventsList.astro';
 
 interface Props {
 	block: Block;
@@ -38,6 +39,8 @@ const { block } = Astro.props;
 				return <ResourcesList {...block} />;
 			case 'blocks.press-releases-list':
 				return <PressReleasesList {...block} />;
+			case 'blocks.events-list':
+				return <EventsList {...block} />;
 			default:
 				// Unknown block types are skipped rather than breaking the page.
 				return null;

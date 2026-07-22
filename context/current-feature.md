@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Press Release Page
+**Feature:** Events Page
 
 ###### Status
-Completed — Press releases from the `Press Release` collection (extended with a required `category` enum `news` / `announcement` / `event`, default `news`, and a `coverImage` media field) render on `/press-releases` via a new `blocks.press-releases-list` dynamic-zone block as cards showing cover image (gradient fallback), category badge, date, title and excerpt. Each card links to an SSR detail page `/press-releases/[slug]` showing breadcrumb (Home › Press Releases › Title), category, date, cover image and rich-text content; a reusable `Breadcrumb.astro` component was added. The listing has a client-side filter: category pills (All / News / Announcements / Events) composed with a text search over title + excerpt. Seed creates 10 dummy press releases with generated SVG cover images (idempotent per title), grants Public find/findOne on Press Release, creates the `/press-releases` page (only when missing or placeholder-only) and appends a "Press Releases" nav link when absent.
+Completed — Events from the `Event` collection render on `/events` via a new `blocks.events-list` dynamic-zone block as cards showing image (gradient fallback), Upcoming/Past status badge, date, location, title and a description snippet; upcoming events sort soonest-first ahead of past events newest-first. Client-side filter: All / Upcoming / Past pills composed with a text search over title, location and description. Each card links to the detail page `/events/[slug]`, rewritten from the static build-time loader to SSR (`fetchStrapi` by slug) with Breadcrumb (Home › Events › Title), date, location, image and rich-text description; the unused `events` collection was removed from `content.config.ts`, fixing the "events collection empty" build warning. Seed creates 8 dummy events (4 upcoming, 4 past, cross-consistent with seeded press releases) with generated SVG cover images (idempotent per title; `makeCoverSvg` generalised to take a kicker label), grants Public find/findOne on Event, and wires the `/events` page (only when missing or placeholder-only; nav already links `/events`).
 
 ###### History
+* Press Release Page completed.
 * Resources Document List completed.
 * Member Manual Ordering completed.
 * Member Profiles (Board & Executive) completed.

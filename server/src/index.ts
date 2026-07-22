@@ -7,6 +7,7 @@ const MEMBER_UID = 'api::executive-member.executive-member';
 const PAGE_UID = 'api::page.page';
 const RESOURCE_UID = 'api::resource.resource';
 const PRESS_UID = 'api::press-release.press-release';
+const EVENT_UID = 'api::event.event';
 const GLOBAL_UID = 'api::global.global';
 
 // Dummy member profiles seeded once (only when the collection is empty) so
@@ -607,9 +608,9 @@ const COVER_PALETTES = [
   ['#4a5d8a', '#2b3a5e'],
 ] as const;
 
-// Build a simple branded SVG cover (gradient, KCCI wordmark, category label,
-// wrapped title) so seeded press releases ship with a real cover image.
-function makeCoverSvg(title: string, category: string, index: number): Buffer {
+// Build a simple branded SVG cover (gradient, KCCI wordmark, kicker label,
+// wrapped title) so seeded entries ship with a real cover image.
+function makeCoverSvg(title: string, kicker: string, index: number): Buffer {
   const escapeXml = (text: string) =>
     text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -647,7 +648,7 @@ function makeCoverSvg(title: string, category: string, index: number): Buffer {
   <circle cx="1050" cy="110" r="230" fill="#ffffff" opacity="0.08"/>
   <circle cx="140" cy="690" r="260" fill="#ffffff" opacity="0.06"/>
   <text x="80" y="140" font-family="Verdana, sans-serif" font-size="30" font-weight="bold" letter-spacing="6" fill="#ffffff" opacity="0.9">KCCI</text>
-  <text x="80" y="330" font-family="Verdana, sans-serif" font-size="24" letter-spacing="4" fill="#ffffff" opacity="0.75">PRESS RELEASE · ${escapeXml(category.toUpperCase())}</text>
+  <text x="80" y="330" font-family="Verdana, sans-serif" font-size="24" letter-spacing="4" fill="#ffffff" opacity="0.75">${escapeXml(kicker.toUpperCase())}</text>
   ${titleText}
 </svg>
 `;
@@ -666,7 +667,7 @@ async function seedDummyPressReleases(strapi: Core.Strapi) {
       });
       if (existing) continue;
 
-      const svg = makeCoverSvg(release.title, release.category, index);
+      const svg = makeCoverSvg(release.title, `Press Release · ${release.category}`, index);
       const fileName = `${release.slug}.svg`;
       const filePath = join(tmpDir, fileName);
       await writeFile(filePath, svg);
@@ -847,6 +848,191 @@ async function seedPressReleaseNav(strapi: Core.Strapi) {
   strapi.log.info('[seed] Wired the "Press Releases" nav link.');
 }
 
+// Dummy events seeded idempotently per title: four upcoming and four past
+// (relative to mid-2026), cross-consistent with the seeded press releases.
+const DUMMY_EVENTS = [
+  {
+    title: 'Kiribati Trade Expo 2026',
+    slug: 'kiribati-trade-expo-2026',
+    date: '2026-11-12T09:00:00.000Z',
+    location: 'Bairiki Square, Tarawa',
+    description:
+      'The national trade expo returns for its fourth edition, showcasing local producers, handicraft exporters, fisheries businesses and service providers to buyers, development partners and the public.\n\n## Programme highlights\n\n- Exhibitor booths from across Kiribati, including subsidised outer-island stalls\n- Buyer–seller matching sessions\n- Daily cultural performances and product demonstrations\n\nExhibitor registrations open in July; KCCI members receive discounted booth rates.',
+  },
+  {
+    title: 'Suva Trade Mission for Kiribati Exporters',
+    slug: 'suva-trade-mission-for-kiribati-exporters',
+    date: '2026-10-05T09:00:00.000Z',
+    location: 'Suva, Fiji',
+    description:
+      'A week-long trade mission to Suva organised under the KCCI–FCEF Memorandum of Understanding, connecting Kiribati exporters with Fijian buyers, distributors and logistics providers.\n\nThe delegation programme includes market visits, matched business meetings and a joint networking reception hosted by the Fiji Commerce & Employers Federation. Export-ready members in handicrafts, fisheries and agri-products are encouraged to apply.',
+  },
+  {
+    title: 'Business After Hours Networking Evening',
+    slug: 'business-after-hours-networking-evening',
+    date: '2026-09-11T17:30:00.000Z',
+    location: 'Otintaai Hotel, Bikenibeu',
+    description:
+      'An informal evening for members and guests to connect over refreshments, hear a short briefing on Chamber activities and meet the new Board of Directors.\n\nFree for members; a small door charge applies for non-members. Registration is appreciated for catering purposes.',
+  },
+  {
+    title: 'SME Finance Clinic',
+    slug: 'sme-finance-clinic',
+    date: '2026-08-19T09:00:00.000Z',
+    location: 'KCCI Office, Betio',
+    description:
+      'One-on-one advisory sessions with bank lending officers and Chamber advisers on loan applications, grant readiness and financial record-keeping for small businesses.\n\nBring your business records and any draft applications. Sessions run for 45 minutes and must be booked with the secretariat in advance; 2026 Small Business Grant applicants receive priority.',
+  },
+  {
+    title: 'KCCI Annual General Meeting 2026',
+    slug: 'kcci-annual-general-meeting-2026',
+    date: '2026-05-15T14:00:00.000Z',
+    location: 'Otintaai Hotel, Bikenibeu',
+    description:
+      'The Annual General Meeting of the Kiribati Chamber of Commerce & Industry, covering the annual report, audited financial statements, election of the 2026–2028 Board of Directors and proposed amendments to the membership by-laws.\n\nThe membership elected a new board at this meeting, returning Taneti Baraniko as Board Chair.',
+  },
+  {
+    title: 'Digital Skills Training Workshop for SMEs',
+    slug: 'digital-skills-training-workshop-for-smes',
+    date: '2026-03-24T09:00:00.000Z',
+    location: 'KCCI Office, Betio',
+    description:
+      'A free two-day workshop for small and medium enterprises covering online payments, social-media marketing and free bookkeeping software.\n\nThirty participants completed the programme, with priority given to members. A follow-up cohort is being considered for later in 2026.',
+  },
+  {
+    title: 'Business Licensing Forum',
+    slug: 'business-licensing-forum',
+    date: '2026-01-14T09:00:00.000Z',
+    location: 'Parliament Conference Room, Ambo',
+    description:
+      'A joint KCCI–Ministry of Finance and Economic Development forum on business licensing reform, attended by more than 50 business owners.\n\nParticipants raised renewal delays, inconsistent council fees and the lack of an online application option; officials committed to piloting a simplified renewal process in South Tarawa during 2026.',
+  },
+  {
+    title: 'Kiribati Trade Expo 2025',
+    slug: 'kiribati-trade-expo-2025',
+    date: '2025-11-13T09:00:00.000Z',
+    location: 'Bairiki Square, Tarawa',
+    description:
+      'The third edition of the national trade expo attracted more than 80 exhibitors and 4,000 visitors over three days.\n\nHighlights included the first dedicated outer-island producers pavilion and a buyer programme that generated new supply agreements for local handicraft and fisheries businesses.',
+  },
+] as const;
+
+async function seedDummyEvents(strapi: Core.Strapi) {
+  const tmpDir = await mkdtemp(join(tmpdir(), 'kcci-seed-events-'));
+  let created = 0;
+  try {
+    for (const [index, event] of DUMMY_EVENTS.entries()) {
+      // Idempotent per title so dummy items slot in next to any real events
+      // the client has already added.
+      const existing = await strapi.documents(EVENT_UID).findFirst({
+        filters: { title: event.title },
+      });
+      if (existing) continue;
+
+      const svg = makeCoverSvg(event.title, 'KCCI Event', index);
+      const fileName = `${event.slug}.svg`;
+      const filePath = join(tmpDir, fileName);
+      await writeFile(filePath, svg);
+
+      const [uploaded] = await strapi
+        .plugin('upload')
+        .service('upload')
+        .upload({
+          data: { fileInfo: { name: event.title, caption: null, alternativeText: event.title } },
+          files: {
+            filepath: filePath,
+            originalFilename: fileName,
+            mimetype: 'image/svg+xml',
+            size: svg.length,
+          },
+        });
+
+      await strapi.documents(EVENT_UID).create({
+        data: {
+          title: event.title,
+          slug: event.slug,
+          date: event.date,
+          location: event.location,
+          description: event.description,
+          ...(uploaded?.id ? { image: uploaded.id } : {}),
+        },
+        status: 'published',
+      });
+      created += 1;
+    }
+    if (created > 0) strapi.log.info(`[seed] Created ${created} dummy events.`);
+  } finally {
+    await rm(tmpDir, { recursive: true, force: true });
+  }
+}
+
+// Grant the Public role read access to events so the frontend can list and
+// open them anonymously.
+async function seedPublicEventPermissions(strapi: Core.Strapi) {
+  const publicRole = await strapi.db
+    .query('plugin::users-permissions.role')
+    .findOne({ where: { type: 'public' } });
+  if (!publicRole) return;
+
+  const actions = ['api::event.event.find', 'api::event.event.findOne'];
+  for (const action of actions) {
+    const existing = await strapi.db
+      .query('plugin::users-permissions.permission')
+      .findOne({ where: { action, role: publicRole.id } });
+    if (existing) continue;
+
+    await strapi.db
+      .query('plugin::users-permissions.permission')
+      .create({ data: { action, role: publicRole.id } });
+    strapi.log.info(`[seed] Granted public permission "${action}".`);
+  }
+}
+
+// Wire the /events page (the nav already links to it): create it if missing,
+// and add its Events List block unless the client has customised the content.
+async function seedEventsPage(strapi: Core.Strapi) {
+  const content = [
+    {
+      __component: 'blocks.rich-text' as const,
+      body: '# Events\n\nTrade fairs, workshops, forums and networking events hosted by the Kiribati Chamber of Commerce & Industry.',
+    },
+    { __component: 'blocks.events-list' as const, title: null },
+  ];
+
+  const page = await strapi.documents(PAGE_UID).findFirst({
+    filters: { slug: 'events' },
+    populate: { content: { populate: '*' } },
+  });
+
+  if (!page) {
+    await strapi.documents(PAGE_UID).create({
+      data: { title: 'Events', slug: 'events', content },
+      status: 'published',
+    });
+    strapi.log.info('[seed] Created the "events" page with an Events List block.');
+    return;
+  }
+
+  const existingContent = page.content ?? [];
+  if (existingContent.some((block) => block.__component === 'blocks.events-list')) return;
+
+  const onlyPlaceholders = existingContent.every(
+    (block) =>
+      block.__component === 'blocks.rich-text' && (block.body ?? '').includes('Placeholder content'),
+  );
+  if (!onlyPlaceholders) {
+    strapi.log.warn('[seed] Page "events" has custom content; add the Events List block manually.');
+    return;
+  }
+
+  await strapi.documents(PAGE_UID).update({
+    documentId: page.documentId,
+    data: { content },
+    status: 'published',
+  });
+  strapi.log.info('[seed] Added the Events List block to "events".');
+}
+
 async function seedMemberGrids(strapi: Core.Strapi) {
   for (const def of MEMBER_PAGES) {
     const page = await strapi.documents(PAGE_UID).findFirst({
@@ -915,5 +1101,8 @@ export default {
     await seedPressReleasePage(strapi);
     await seedPressReleaseNav(strapi);
     await seedPublicPressReleasePermissions(strapi);
+    await seedDummyEvents(strapi);
+    await seedEventsPage(strapi);
+    await seedPublicEventPermissions(strapi);
   },
 };

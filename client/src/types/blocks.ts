@@ -139,6 +139,24 @@ export interface PressReleasesListBlock {
 	title: string | null;
 }
 
+// Named EventItem to avoid clashing with the DOM `Event` type.
+export interface EventItem {
+	id: number;
+	documentId: string;
+	title: string | null;
+	slug: string | null;
+	date: string | null;
+	location: string | null;
+	description: string | null;
+	image?: StrapiMedia | null;
+}
+
+export interface EventsListBlock {
+	__component: 'blocks.events-list';
+	id: number;
+	title: string | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -154,7 +172,8 @@ export type Block =
 	| RichTextBlock
 	| MembersGridBlock
 	| ResourcesListBlock
-	| PressReleasesListBlock;
+	| PressReleasesListBlock
+	| EventsListBlock;
 
 export interface GlobalData {
 	siteName: string | null;

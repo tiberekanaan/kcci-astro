@@ -29,6 +29,18 @@ export interface BlocksCta extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksEventsList extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_events_lists';
+  info: {
+    description: 'Card grid of events with upcoming/past and search filtering.';
+    displayName: 'Events List';
+    icon: 'calendar';
+  };
+  attributes: {
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksHero extends Struct.ComponentSchema {
   collectionName: 'components_blocks_heroes';
   info: {
@@ -192,6 +204,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'blocks.about-section': BlocksAboutSection;
       'blocks.cta': BlocksCta;
+      'blocks.events-list': BlocksEventsList;
       'blocks.hero': BlocksHero;
       'blocks.members-grid': BlocksMembersGrid;
       'blocks.press-releases-list': BlocksPressReleasesList;

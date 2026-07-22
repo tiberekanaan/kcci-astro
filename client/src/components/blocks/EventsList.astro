@@ -1,0 +1,229 @@
+---
+import type { EventItem, EventsListBlock } from '../../types/blocks';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
+
+type Props = EventsListBlock;
+
+const { title } = Astro.props;
+
+// SSR: events are managed as a Strapi collection so the client can
+// add/edit/delete them without touching the page's dynamic zone.
+const events =
+	(await fetchStrapi<EventItem[]>(
+		'/api/events?populate=image&sort[0]=date:desc&pagination[pageSize]=100',
+	)) ?? [];
+
+const now = Date.now();
+const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+
+// Strip Markdown syntax so card snippets read as plain text.
+const snippet = (md: string | null) =>
+	(md ?? '')
+		.replace(/^#+\s.*$/gm, '')
+		.replace(/[*_`>#-]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+const items = events
+	.filter((event) => event.slug)
+	.map((event) => ({
+		...event,
+		url: `/events/${event.slug}`,
+		imageUrl: mediaUrl(event.image?.url),
+		formattedDate: event.date ? dateFormatter.format(new Date(event.date)) : null,
+		upcoming: event.date ? new Date(event.date).getTime() >= now : false,
+		excerpt: snippet(event.description),
+	}));
+
+// Upcoming events soonest-first, then past events newest-first.
+const time = (date: string | null) => (date ? new Date(date).getTime() : 0);
+const sorted = [
+	...items.filter((item) => item.upcoming).sort((a, b) => time(a.date) - time(b.date)),
+	...items.filter((item) => !item.upcoming).sort((a, b) => time(b.date) - time(a.date)),
+];
+
+const FILTERS = [
+	{ key: 'all', label: 'All' },
+	{ key: 'upcoming', label: 'Upcoming' },
+	{ key: 'past', label: 'Past' },
+] as const;
+---
+
+<section class="py-20" data-events>
+	<div class="mx-auto max-w-6xl px-6">
+		{title && <h2 data-reveal class="mb-8 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+
+		<div data-reveal class="mb-12 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+			<div class="flex flex-wrap gap-2" role="group" aria-label="Filter events by status">
+				{
+					FILTERS.map((filter, i) => (
+						<button
+							type="button"
+							data-events-filter
+							data-status={filter.key}
+							aria-pressed={i === 0 ? 'true' : 'false'}
+							class={
+								i === 0
+									? 'rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300'
+									: 'rounded-full border border-muted px-4 py-2 text-sm font-semibold transition-all duration-300 hover:border-primary/40 hover:text-primary'
+							}
+						>
+							{filter.label}
+						</button>
+					))
+				}
+			</div>
+			<label class="relative block lg:w-72">
+				<span class="sr-only">Search events</span>
+				<svg
+					class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<circle cx="11" cy="11" r="8" />
+					<path d="m21 21-4.3-4.3" />
+				</svg>
+				<input
+					type="search"
+					data-events-search
+					placeholder="Search events…"
+					class="w-full rounded-xl border border-muted bg-background py-3 pl-12 pr-4 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
+				/>
+			</label>
+		</div>
+
+		{
+			sorted.length === 0 ? (
+				<p class="text-center text-muted-foreground">Events are coming soon.</p>
+			) : (
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{sorted.map((item, i) => (
+						<a
+							href={item.url}
+							data-reveal
+							data-events-item
+							data-status={item.upcoming ? 'upcoming' : 'past'}
+							data-search={`${item.title ?? ''} ${item.location ?? ''} ${item.excerpt}`.toLowerCase()}
+							style={`--reveal-delay: ${i * 90}ms`}
+							class="group flex flex-col overflow-hidden rounded-2xl border border-muted bg-background transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+						>
+							{item.imageUrl ? (
+								<img
+									src={item.imageUrl}
+									alt={item.image?.alternativeText ?? item.title ?? ''}
+									class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+									loading="lazy"
+								/>
+							) : (
+								<div
+									class="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10"
+									role="img"
+									aria-label={`Placeholder image for ${item.title ?? 'event'}`}
+								>
+									<svg class="h-12 w-12 text-primary/25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+										<line x1="16" x2="16" y1="2" y2="6" />
+										<line x1="8" x2="8" y1="2" y2="6" />
+										<line x1="3" x2="21" y1="10" y2="10" />
+									</svg>
+								</div>
+							)}
+							<div class="flex flex-1 flex-col p-6">
+								<p class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+									<span
+										class={
+											item.upcoming
+												? 'rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary'
+												: 'rounded-full bg-muted px-2.5 py-0.5 font-medium'
+										}
+									>
+										{item.upcoming ? 'Upcoming' : 'Past'}
+									</span>
+									{item.formattedDate && <time datetime={item.date ?? undefined}>{item.formattedDate}</time>}
+								</p>
+								<h3 class="mt-3 text-lg font-semibold leading-snug transition-colors group-hover:text-primary">
+									{item.title}
+								</h3>
+								{item.location && (
+									<p class="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+										<svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+											<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+											<circle cx="12" cy="10" r="3" />
+										</svg>
+										{item.location}
+									</p>
+								)}
+								{item.excerpt && (
+									<p class="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">{item.excerpt}</p>
+								)}
+								<span class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+									View event
+									<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M5 12h14" />
+										<path d="m12 5 7 7-7 7" />
+									</svg>
+								</span>
+							</div>
+						</a>
+					))}
+				</div>
+			)
+		}
+
+		<p data-events-empty hidden class="text-center text-muted-foreground">
+			No events match your filter.
+		</p>
+	</div>
+</section>
+
+<script>
+	// Client-side status + search filter. The two compose: a card must match
+	// the active status pill AND the search query. `style.display` is used
+	// for hiding: the `hidden` attribute would lose to the cards' `flex` class.
+	const PILL = 'rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ' as const;
+	const PILL_IDLE = `${PILL}border border-muted hover:border-primary/40 hover:text-primary`;
+	const PILL_ACTIVE = `${PILL}bg-primary text-white shadow-sm`;
+
+	for (const root of document.querySelectorAll('[data-events]')) {
+		const input = root.querySelector<HTMLInputElement>('[data-events-search]');
+		const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-events-filter]')];
+		const items = [...root.querySelectorAll<HTMLElement>('[data-events-item]')];
+		const empty = root.querySelector<HTMLElement>('[data-events-empty]');
+		if (!input || items.length === 0) continue;
+
+		let status = 'all';
+
+		const apply = () => {
+			const query = input.value.trim().toLowerCase();
+			let anyVisible = false;
+
+			for (const item of items) {
+				const matches =
+					(status === 'all' || item.dataset.status === status) &&
+					(!query || (item.dataset.search ?? '').includes(query));
+				item.style.display = matches ? '' : 'none';
+				anyVisible ||= matches;
+			}
+
+			if (empty) empty.hidden = anyVisible;
+		};
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				status = button.dataset.status ?? 'all';
+				for (const other of buttons) {
+					const active = other === button;
+					other.className = active ? PILL_ACTIVE : PILL_IDLE;
+					other.setAttribute('aria-pressed', String(active));
+				}
+				apply();
+			});
+		}
+		input.addEventListener('input', apply);
+	}
+</script>

@@ -6,26 +6,10 @@ import { strapiLoader } from 'strapi-community-astro-loader';
 // include the `/api` path segment.
 const baseURL = `${import.meta.env.STRAPI_BASE_URL}/api`;
 
-// Shared shape for Strapi media fields (e.g. event/member images).
+// Shared shape for Strapi media fields (e.g. member images).
 const strapiImage = z.object({
   url: z.string(),
   alternativeText: z.string().nullish(),
-});
-
-const events = defineCollection({
-  loader: strapiLoader({
-    contentType: 'event',
-    clientConfig: { baseURL },
-    params: { populate: ['image'] },
-  }),
-  schema: z.object({
-    title: z.string(),
-    slug: z.string().optional(),
-    date: z.string().nullish(),
-    location: z.string().nullish(),
-    description: z.string().nullish(),
-    image: strapiImage.nullish(),
-  }),
 });
 
 const faqs = defineCollection({
@@ -56,4 +40,4 @@ const executiveMembers = defineCollection({
   }),
 });
 
-export const collections = { events, faqs, executiveMembers };
+export const collections = { faqs, executiveMembers };
