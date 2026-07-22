@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_blocks_resources_lists",
+  "info": {
+    "displayName": "Resources List",
+    "description": "List of resources (documents, links, videos) with view/download actions.",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "regulations",
+        "internal",
+        "external"
+      ]
+    }
+  }
+}

@@ -7,6 +7,7 @@ import ToolkitGrid from './blocks/ToolkitGrid.astro';
 import Cta from './blocks/Cta.astro';
 import RichText from './blocks/RichText.astro';
 import MembersGrid from './blocks/MembersGrid.astro';
+import ResourcesList from './blocks/ResourcesList.astro';
 
 interface Props {
 	block: Block;
@@ -32,6 +33,8 @@ const { block } = Astro.props;
 				return <RichText {...block} />;
 			case 'blocks.members-grid':
 				return <MembersGrid {...block} />;
+			case 'blocks.resources-list':
+				return <ResourcesList {...block} />;
 			default:
 				// Unknown block types are skipped rather than breaking the page.
 				return null;

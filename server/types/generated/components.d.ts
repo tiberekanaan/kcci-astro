@@ -58,6 +58,21 @@ export interface BlocksMembersGrid extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksResourcesList extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_resources_lists';
+  info: {
+    description: 'List of resources (documents, links, videos) with view/download actions.';
+    displayName: 'Resources List';
+    icon: 'file';
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      ['regulations', 'internal', 'external']
+    >;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksRichText extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_texts';
   info: {
@@ -167,6 +182,7 @@ declare module '@strapi/strapi' {
       'blocks.cta': BlocksCta;
       'blocks.hero': BlocksHero;
       'blocks.members-grid': BlocksMembersGrid;
+      'blocks.resources-list': BlocksResourcesList;
       'blocks.rich-text': BlocksRichText;
       'blocks.services-grid': BlocksServicesGrid;
       'blocks.toolkit-grid': BlocksToolkitGrid;

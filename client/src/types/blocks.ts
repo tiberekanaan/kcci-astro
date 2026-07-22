@@ -103,6 +103,24 @@ export interface MembersGridBlock {
 	memberType: 'board' | 'executive' | null;
 }
 
+export interface Resource {
+	id: number;
+	documentId: string;
+	title: string | null;
+	type: 'Document' | 'Link' | 'Video' | null;
+	category: 'regulations' | 'internal' | 'external' | null;
+	description: string | null;
+	externalLink: string | null;
+	file?: (StrapiMedia & { name?: string | null; ext?: string | null; size?: number | null }) | null;
+}
+
+export interface ResourcesListBlock {
+	__component: 'blocks.resources-list';
+	id: number;
+	title: string | null;
+	category?: 'regulations' | 'internal' | 'external' | null;
+}
+
 export interface RichTextBlock {
 	__component: 'blocks.rich-text';
 	id: number;
@@ -116,7 +134,8 @@ export type Block =
 	| ToolkitGridBlock
 	| CtaBlock
 	| RichTextBlock
-	| MembersGridBlock;
+	| MembersGridBlock
+	| ResourcesListBlock;
 
 export interface GlobalData {
 	siteName: string | null;

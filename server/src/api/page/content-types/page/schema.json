@@ -29,7 +29,8 @@
         "blocks.toolkit-grid",
         "blocks.cta",
         "blocks.rich-text",
-        "blocks.members-grid"
+        "blocks.members-grid",
+        "blocks.resources-list"
       ]
     }
   }

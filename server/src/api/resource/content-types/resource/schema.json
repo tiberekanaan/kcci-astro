@@ -24,6 +24,16 @@
         "Video"
       ]
     },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "regulations",
+        "internal",
+        "external"
+      ],
+      "default": "internal",
+      "required": true
+    },
     "file": {
       "type": "media",
       "multiple": false,

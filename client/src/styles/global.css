@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* Semantic OKLCH color tokens */
@@ -24,6 +25,16 @@
   --animate-float-slow: float 13s ease-in-out infinite;
   --animate-gradient: gradient-pan 16s ease infinite;
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Point Tailwind Typography (`prose`) at the site's semantic tokens. */
+.prose {
+  --tw-prose-body: var(--color-muted-foreground);
+  --tw-prose-headings: var(--color-foreground);
+  --tw-prose-bold: var(--color-foreground);
+  --tw-prose-links: var(--color-primary);
+  --tw-prose-bullets: var(--color-sand-deep);
+  --tw-prose-quote-borders: var(--color-accent);
 }
 
 @keyframes float {

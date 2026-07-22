@@ -1,0 +1,327 @@
+---
+import type { Resource, ResourcesListBlock } from '../../types/blocks';
+import { fetchStrapi, mediaUrl } from '../../lib/strapi';
+
+type Props = ResourcesListBlock;
+
+const { title, category = null } = Astro.props;
+
+// SSR: resources are managed as a Strapi collection so the client can
+// add/edit/delete documents without touching the page's dynamic zone.
+// A block-level `category` narrows the list to one category page.
+const categoryFilter = category ? `&filters[category][$eq]=${category}` : '';
+const resources =
+	(await fetchStrapi<Resource[]>(
+		`/api/resources?populate=file&sort[0]=createdAt:asc&pagination[pageSize]=100${categoryFilter}`,
+	)) ?? [];
+
+function formatSize(kb: number | null | undefined): string | null {
+	// Strapi stores media size in kilobytes.
+	if (!kb) return null;
+	return kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${Math.max(kb, 1).toFixed(0)} KB`;
+}
+
+const items = resources.map((resource) => {
+	const fileUrl = mediaUrl(resource.file?.url);
+	const viewUrl = fileUrl ?? resource.externalLink ?? null;
+	return {
+		...resource,
+		viewUrl,
+		downloadUrl: fileUrl,
+		size: formatSize(resource.file?.size),
+	};
+});
+
+// Fixed display order; uncategorised entries fall back to Internal Resources.
+const CATEGORIES = [
+	{
+		key: 'regulations',
+		label: 'Regulations & Acts',
+		blurb: 'Laws and regulations related to doing business in Kiribati, internal and external.',
+	},
+	{
+		key: 'internal',
+		label: 'Internal Resources',
+		blurb: 'Chamber documents, AGM minutes, reports and member forms.',
+	},
+	{
+		key: 'external',
+		label: 'External Resources',
+		blurb: 'Tools, portals and market insights from government and partner organisations.',
+	},
+] as const;
+
+// On a single-category page the intro heading already names the category, so
+// group headings are dropped and only that category's items render.
+const showHeadings = !category;
+const groups = CATEGORIES.filter((c) => !category || c.key === category)
+	.map((c) => ({
+		...c,
+		items: items.filter((item) => (item.category ?? 'internal') === c.key),
+	}))
+	.filter((group) => group.items.length > 0);
+---
+
+<section class="py-20" data-resources>
+	<div class="mx-auto max-w-4xl px-6">
+		{title && <h2 data-reveal class="mb-8 text-center text-3xl font-bold tracking-tight">{title}</h2>}
+
+		<div data-reveal class="mb-12 flex flex-col gap-3 sm:flex-row sm:items-center">
+		<label class="relative block flex-1">
+			<span class="sr-only">Search resources</span>
+			<svg
+				class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<circle cx="11" cy="11" r="8" />
+				<path d="m21 21-4.3-4.3" />
+			</svg>
+			<input
+				type="search"
+				data-resources-search
+				placeholder="Search resources…"
+				class="w-full rounded-xl border border-muted bg-background py-3 pl-12 pr-4 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
+			/>
+		</label>
+		{
+			category && (
+				<label class="flex shrink-0 items-center gap-2 text-sm text-muted-foreground">
+					Show
+					<select
+						data-resources-size
+						class="rounded-xl border border-muted bg-background py-3 pl-3 pr-2 text-sm font-medium text-foreground shadow-sm transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
+					>
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+					</select>
+					per page
+				</label>
+			)
+		}
+		</div>
+
+		{
+			groups.length === 0 ? (
+				<p class="text-center text-muted-foreground">Resources are coming soon.</p>
+			) : (
+				groups.map((group) => (
+					<div data-resources-group class="mb-12 last:mb-0">
+						{showHeadings && (
+							<>
+								<h3 data-reveal class="text-xl font-bold tracking-tight">{group.label}</h3>
+								<p data-reveal class="mt-1 mb-5 text-sm text-muted-foreground">{group.blurb}</p>
+							</>
+						)}
+						<ul class="flex flex-col gap-4">
+							{group.items.map((item, i) => (
+								<li
+									data-reveal
+									data-resources-item
+									data-search={`${item.title ?? ''} ${item.description ?? ''}`.toLowerCase()}
+									style={`--reveal-delay: ${i * 90}ms`}
+									class="group flex flex-col gap-4 rounded-2xl border border-muted bg-background p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 sm:flex-row sm:items-center"
+								>
+									<div class="flex flex-1 items-start gap-4">
+										<span class="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+											{item.type === 'Link' ? (
+												<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+													<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+													<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+												</svg>
+											) : item.type === 'Video' ? (
+												<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+													<polygon points="6 3 20 12 6 21 6 3" />
+												</svg>
+											) : (
+												<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+													<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+													<path d="M14 2v6h6" />
+												</svg>
+											)}
+										</span>
+										<div>
+											<h4 class="font-semibold">{item.title}</h4>
+											{item.description && (
+												<p class="mt-1 text-sm text-muted-foreground">{item.description}</p>
+											)}
+											<p class="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+												{item.type && (
+													<span class="rounded-full bg-muted px-2 py-0.5 font-medium">{item.type}</span>
+												)}
+												{item.file?.ext && <span class="uppercase">{item.file.ext.replace('.', '')}</span>}
+												{item.size && <span>{item.size}</span>}
+											</p>
+										</div>
+									</div>
+									<div class="flex shrink-0 gap-2 pl-15 sm:pl-0">
+										{item.viewUrl && (
+											<a
+												href={item.viewUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="inline-flex items-center gap-1.5 rounded-lg border border-muted px-4 py-2 text-sm font-semibold transition-all duration-300 hover:border-primary/40 hover:text-primary active:scale-95"
+											>
+												<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+													<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+													<circle cx="12" cy="12" r="3" />
+												</svg>
+												View
+											</a>
+										)}
+										{item.downloadUrl && (
+											<a
+												href={item.downloadUrl}
+												download
+												class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20 active:scale-95"
+											>
+												<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+													<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+													<path d="m7 10 5 5 5-5" />
+													<path d="M12 15V3" />
+												</svg>
+												Download
+											</a>
+										)}
+									</div>
+								</li>
+							))}
+						</ul>
+					</div>
+				))
+			)
+		}
+
+		{
+			category && groups.length > 0 && (
+				<nav
+					data-resources-pager
+					aria-label="Resources pagination"
+					class="mt-8 flex items-center justify-center gap-2"
+					style="display: none"
+				>
+					<button
+						type="button"
+						data-resources-prev
+						class="rounded-lg border border-muted px-3.5 py-2 text-sm font-semibold transition-all duration-300 hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
+					>
+						Prev
+					</button>
+					<span data-resources-pages class="flex items-center gap-2" />
+					<button
+						type="button"
+						data-resources-next
+						class="rounded-lg border border-muted px-3.5 py-2 text-sm font-semibold transition-all duration-300 hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
+					>
+						Next
+					</button>
+				</nav>
+			)
+		}
+
+		<p data-resources-empty hidden class="text-center text-muted-foreground">
+			No resources match your search.
+		</p>
+	</div>
+</section>
+
+<script>
+	// Client-side search + pagination. Search hides non-matching rows (and any
+	// emptied category section); single-category blocks also paginate the
+	// matched rows, with a page-size selector. `style.display` is used for
+	// hiding: the `hidden` attribute would lose to the rows' `flex` class.
+	const PAGE_BTN =
+		'rounded-lg px-3.5 py-2 text-sm font-semibold transition-all duration-300 ' as const;
+	const PAGE_BTN_IDLE = `${PAGE_BTN}border border-muted hover:border-primary/40 hover:text-primary`;
+	const PAGE_BTN_ACTIVE = `${PAGE_BTN}bg-primary text-white shadow-sm`;
+
+	for (const root of document.querySelectorAll('[data-resources]')) {
+		const input = root.querySelector<HTMLInputElement>('[data-resources-search]');
+		if (!input) continue;
+
+		const groups = [...root.querySelectorAll<HTMLElement>('[data-resources-group]')];
+		const empty = root.querySelector<HTMLElement>('[data-resources-empty]');
+		const sizeSelect = root.querySelector<HTMLSelectElement>('[data-resources-size]');
+		const pager = root.querySelector<HTMLElement>('[data-resources-pager]');
+		const pagesEl = root.querySelector<HTMLElement>('[data-resources-pages]');
+		const prevBtn = root.querySelector<HTMLButtonElement>('[data-resources-prev]');
+		const nextBtn = root.querySelector<HTMLButtonElement>('[data-resources-next]');
+
+		const paginated = Boolean(sizeSelect && pager && pagesEl && groups.length === 1);
+		let page = 1;
+
+		const apply = () => {
+			const query = input.value.trim().toLowerCase();
+			let anyVisible = false;
+
+			for (const group of groups) {
+				const items = [...group.querySelectorAll<HTMLElement>('[data-resources-item]')];
+				const matched = items.filter((item) => {
+					const matches = !query || (item.dataset.search ?? '').includes(query);
+					if (!matches) item.style.display = 'none';
+					return matches;
+				});
+
+				if (paginated) {
+					const pageSize = Number(sizeSelect!.value) || 5;
+					const pageCount = Math.max(1, Math.ceil(matched.length / pageSize));
+					page = Math.min(Math.max(page, 1), pageCount);
+
+					matched.forEach((item, i) => {
+						const onPage = i >= (page - 1) * pageSize && i < page * pageSize;
+						item.style.display = onPage ? '' : 'none';
+					});
+
+					pager!.style.display = pageCount > 1 ? '' : 'none';
+					pagesEl!.textContent = '';
+					for (let p = 1; p <= pageCount; p++) {
+						const btn = document.createElement('button');
+						btn.type = 'button';
+						btn.textContent = String(p);
+						btn.className = p === page ? PAGE_BTN_ACTIVE : PAGE_BTN_IDLE;
+						if (p === page) btn.setAttribute('aria-current', 'page');
+						btn.addEventListener('click', () => {
+							page = p;
+							apply();
+						});
+						pagesEl!.append(btn);
+					}
+					if (prevBtn) prevBtn.disabled = page <= 1;
+					if (nextBtn) nextBtn.disabled = page >= pageCount;
+				} else {
+					for (const item of matched) item.style.display = '';
+				}
+
+				group.style.display = matched.length > 0 ? '' : 'none';
+				anyVisible ||= matched.length > 0;
+			}
+
+			if (empty) empty.hidden = anyVisible || groups.length === 0;
+		};
+
+		input.addEventListener('input', () => {
+			page = 1;
+			apply();
+		});
+		sizeSelect?.addEventListener('change', () => {
+			page = 1;
+			apply();
+		});
+		prevBtn?.addEventListener('click', () => {
+			page -= 1;
+			apply();
+		});
+		nextBtn?.addEventListener('click', () => {
+			page += 1;
+			apply();
+		});
+
+		if (paginated) apply();
+	}
+</script>
