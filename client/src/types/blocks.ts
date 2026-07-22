@@ -83,6 +83,7 @@ export interface CtaBlock {
 	button?: SharedButton | null;
 	image?: StrapiMedia | null;
 	imagePosition?: 'right' | 'left' | null;
+	variant?: 'split' | 'spotlight' | 'banner' | null;
 }
 
 export interface Member {

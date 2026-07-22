@@ -4,64 +4,174 @@ import { mediaUrl } from '../../lib/strapi';
 
 type Props = CtaBlock;
 
-const { title, description, button, image, imagePosition } = Astro.props;
+const { title, description, button, image, imagePosition, variant } = Astro.props;
 
 const imageUrl = mediaUrl(image?.url);
 const imageLeft = imagePosition === 'left';
+// Pre-variant entries have no value; render them exactly as before.
+const layout = variant ?? 'split';
+
+const buttonClass =
+	'group inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-300 hover:bg-accent-dark hover:shadow-lg hover:shadow-accent/20 active:scale-95';
 ---
 
-<section id="join" class="bg-sand/60 py-20">
-	<div class="mx-auto grid max-w-6xl items-center gap-10 px-6 md:grid-cols-2">
-		<div data-reveal class:list={['space-y-4', imageLeft && 'md:order-2']}>
-			{title && <h2 class="text-3xl font-bold tracking-tight">{title}</h2>}
-			{description && <p class="text-muted-foreground">{description}</p>}
-			{
-				button?.label && (
-					<a
-						href={button.url ?? '#'}
-						target={button.isExternal ? '_blank' : undefined}
-						rel={button.isExternal ? 'noopener noreferrer' : undefined}
-						class="group inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-300 hover:bg-accent-dark hover:shadow-lg hover:shadow-accent/20 active:scale-95"
-					>
-						{button.label}
-						<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-						</svg>
-					</a>
-				)
-			}
-		</div>
-		{
-			imageUrl ? (
-				<div
-					data-reveal
-					class:list={[
-						'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
-						imageLeft && 'md:order-1',
-					]}
-					style="--reveal-delay: 120ms"
-				>
+{
+	layout === 'banner' ? (
+		<section id="join" class="relative isolate overflow-hidden py-24 text-white md:py-32">
+			{imageUrl ? (
+				<>
 					<img
 						src={imageUrl}
 						alt={image?.alternativeText ?? ''}
-						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+						class="absolute inset-0 -z-20 h-full w-full object-cover"
 					/>
-				</div>
+					<div
+						class="absolute inset-0 -z-10"
+						style="background-image: linear-gradient(115deg, rgba(15, 81, 50, 0.94), rgba(27, 110, 78, 0.82) 55%, rgba(47, 143, 91, 0.62));"
+					/>
+				</>
 			) : (
 				<div
-					data-reveal
-					class:list={[
-						'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
-						imageLeft && 'md:order-1',
-					]}
-					style="--reveal-delay: 120ms; background-image: linear-gradient(135deg, #6fae3d, #2f8f5b);"
-					role="img"
-					aria-label="KCCI members"
-				>
-					<div class="absolute -bottom-10 -left-10 h-40 w-40 animate-float-slow rounded-full bg-accent/30 blur-2xl" />
-					<div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
+					class="absolute inset-0 -z-20 animate-gradient bg-[length:200%_200%]"
+					style="background-image: linear-gradient(115deg, #0f5132, #1b6e6e 38%, #2f8f5b 68%, #6fae3d);"
+				/>
+			)}
+			<div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.14),transparent_55%)]" />
+			<div class="absolute -right-16 top-8 -z-10 h-64 w-64 animate-float rounded-full bg-accent/25 blur-3xl" />
+			<div class="absolute -bottom-20 left-1/4 -z-10 h-56 w-56 animate-float-slow rounded-full bg-primary/40 blur-3xl" />
+
+			<div class="mx-auto max-w-3xl px-6 text-center">
+				<div data-reveal class="space-y-5">
+					{title && <h2 class="text-3xl font-bold tracking-tight md:text-5xl">{title}</h2>}
+					{description && <p class="mx-auto max-w-xl text-base text-white/85 md:text-lg">{description}</p>}
+					{button?.label && (
+						<div class="pt-3">
+							<a
+								href={button.url ?? '#'}
+								target={button.isExternal ? '_blank' : undefined}
+								rel={button.isExternal ? 'noopener noreferrer' : undefined}
+								class:list={[buttonClass, 'px-8 py-3.5 shadow-lg shadow-black/10']}
+							>
+								{button.label}
+								<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+								</svg>
+							</a>
+						</div>
+					)}
 				</div>
-			)
-		}
-	</div>
-</section>
+			</div>
+		</section>
+	) : layout === 'spotlight' ? (
+		<section class="relative overflow-hidden bg-sand/60 py-24">
+			<div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
+			<div class="mx-auto max-w-6xl px-6">
+				<div class="grid items-center md:grid-cols-12">
+					<div
+						data-reveal
+						class:list={[
+							'md:row-start-1',
+							imageLeft ? 'md:col-span-8 md:col-start-1' : 'md:col-span-8 md:col-start-5',
+						]}
+					>
+						{imageUrl ? (
+							<img
+								src={imageUrl}
+								alt={image?.alternativeText ?? ''}
+								class="aspect-[16/10] w-full rounded-3xl object-cover shadow-xl"
+							/>
+						) : (
+							<div
+								class="aspect-[16/10] w-full rounded-3xl shadow-xl"
+								style="background-image: linear-gradient(135deg, #6fae3d, #2f8f5b);"
+								role="img"
+								aria-label={title ?? 'KCCI'}
+							/>
+						)}
+					</div>
+					<div
+						data-reveal
+						style="--reveal-delay: 120ms"
+						class:list={[
+							'relative z-10 -mt-12 md:row-start-1 md:mt-0',
+							imageLeft ? 'mx-4 md:col-span-6 md:col-start-7 md:mx-0' : 'mx-4 md:col-span-6 md:col-start-1 md:mx-0',
+						]}
+					>
+						<div class="space-y-4 rounded-2xl border border-muted bg-background p-8 shadow-xl sm:p-10">
+							<span class="block h-1 w-12 rounded-full bg-accent" aria-hidden="true" />
+							{title && <h2 class="text-3xl font-bold tracking-tight">{title}</h2>}
+							{description && <p class="text-muted-foreground">{description}</p>}
+							{button?.label && (
+								<div class="pt-2">
+									<a
+										href={button.url ?? '#'}
+										target={button.isExternal ? '_blank' : undefined}
+										rel={button.isExternal ? 'noopener noreferrer' : undefined}
+										class={buttonClass}
+									>
+										{button.label}
+										<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+										</svg>
+									</a>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	) : (
+		<section id="join" class="bg-sand/60 py-20">
+			<div class="mx-auto grid max-w-6xl items-center gap-10 px-6 md:grid-cols-2">
+				<div data-reveal class:list={['space-y-4', imageLeft && 'md:order-2']}>
+					{title && <h2 class="text-3xl font-bold tracking-tight">{title}</h2>}
+					{description && <p class="text-muted-foreground">{description}</p>}
+					{button?.label && (
+						<a
+							href={button.url ?? '#'}
+							target={button.isExternal ? '_blank' : undefined}
+							rel={button.isExternal ? 'noopener noreferrer' : undefined}
+							class={buttonClass}
+						>
+							{button.label}
+							<svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+							</svg>
+						</a>
+					)}
+				</div>
+				{imageUrl ? (
+					<div
+						data-reveal
+						class:list={[
+							'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
+							imageLeft && 'md:order-1',
+						]}
+						style="--reveal-delay: 120ms"
+					>
+						<img
+							src={imageUrl}
+							alt={image?.alternativeText ?? ''}
+							class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+						/>
+					</div>
+				) : (
+					<div
+						data-reveal
+						class:list={[
+							'group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg',
+							imageLeft && 'md:order-1',
+						]}
+						style="--reveal-delay: 120ms; background-image: linear-gradient(135deg, #6fae3d, #2f8f5b);"
+						role="img"
+						aria-label="KCCI members"
+					>
+						<div class="absolute -bottom-10 -left-10 h-40 w-40 animate-float-slow rounded-full bg-accent/30 blur-2xl" />
+						<div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
+					</div>
+				)}
+			</div>
+		</section>
+	)
+}

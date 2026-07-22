@@ -1,10 +1,11 @@
 ###### Current Feature
-**Feature:** Our Partners Page
+**Feature:** Homepage CTA Layout Variants
 
 ###### Status
-Completed — `/our-partners` page listing partner organisations (name, website link, logo) via a new `blocks.partners-grid` dynamic-zone block backed by a repeatable `shared.partner-item` component (name, websiteUrl, logo media). Cards link to the partner website and open in a new tab (`target="_blank" rel="noopener noreferrer"`). Seed creates the page (rich-text intro + Partners Grid with dummy partners and generated SVG logos, only when missing or placeholder-only) and nests an "Our Partners" link under the "About Us" nav dropdown.
+Completed — new `variant` enum (`split` | `spotlight` | `banner`, default `split`) on the `blocks.cta` component so the two homepage CTA sections stop rendering as identical mirrored split sections. `spotlight` renders the image with an overlapping white content card and gold accent bar (used by "Find a BLP Business Advisor"); `banner` renders a full-width photo with a green gradient overlay, centered headline and gold button as the page closer (used by "Ready to Join?", which now carries the `#join` anchor targeted by the header Join button). Existing/legacy CTA blocks keep the original `split` layout. One-time bootstrap backfill sets the two homepage CTAs' variants only while still `NULL`, so editor choices are never overwritten.
 
 ###### History
+* Our Partners Page completed.
 * Contact Page completed.
 * Events Page completed.
 * Press Release Page completed.

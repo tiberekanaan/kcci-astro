@@ -32,6 +32,15 @@
         "left"
       ],
       "default": "right"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": [
+        "split",
+        "spotlight",
+        "banner"
+      ],
+      "default": "split"
     }
   }
 }

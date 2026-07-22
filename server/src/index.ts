@@ -1346,6 +1346,26 @@ async function seedMemberGrids(strapi: Core.Strapi) {
   }
 }
 
+async function backfillCtaVariants(strapi: Core.Strapi) {
+  // Components are not documents, so the Document Service cannot reach them;
+  // the Query Engine can. Only rows still on the pre-variant NULL are touched,
+  // so editor choices made afterwards are never overwritten.
+  const targets = [
+    { titlePrefix: 'Find a BLP', variant: 'spotlight' },
+    { titlePrefix: 'Ready to Join', variant: 'banner' },
+  ] as const;
+
+  for (const target of targets) {
+    const { count } = await strapi.db.query('blocks.cta').updateMany({
+      where: { title: { $startsWith: target.titlePrefix }, variant: null },
+      data: { variant: target.variant },
+    });
+    if (count > 0) {
+      strapi.log.info(`[seed] Set CTA variant "${target.variant}" on "${target.titlePrefix}…".`);
+    }
+  }
+}
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -1382,5 +1402,6 @@ export default {
     await seedContactNav(strapi);
     await seedPartnersPage(strapi);
     await seedPartnersNav(strapi);
+    await backfillCtaVariants(strapi);
   },
 };

@@ -42,6 +42,8 @@ export interface BlocksCta extends Struct.ComponentSchema {
     imagePosition: Schema.Attribute.Enumeration<['right', 'left']> &
       Schema.Attribute.DefaultTo<'right'>;
     title: Schema.Attribute.String;
+    variant: Schema.Attribute.Enumeration<['split', 'spotlight', 'banner']> &
+      Schema.Attribute.DefaultTo<'split'>;
   };
 }
 
