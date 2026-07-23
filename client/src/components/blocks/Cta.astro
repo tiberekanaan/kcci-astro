@@ -1,5 +1,6 @@
 ---
 import type { CtaBlock } from '../../types/blocks';
+import { buttonLinkAttrs } from '../../lib/links';
 import { mediaUrl } from '../../lib/strapi';
 
 type Props = CtaBlock;
@@ -47,9 +48,7 @@ const buttonClass =
 					{button?.label && (
 						<div class="pt-3">
 							<a
-								href={button.url ?? '#'}
-								target={button.isExternal ? '_blank' : undefined}
-								rel={button.isExternal ? 'noopener noreferrer' : undefined}
+								{...buttonLinkAttrs(button)}
 								class:list={[buttonClass, 'px-8 py-3.5 shadow-lg shadow-black/10']}
 							>
 								{button.label}
@@ -104,9 +103,7 @@ const buttonClass =
 							{button?.label && (
 								<div class="pt-2">
 									<a
-										href={button.url ?? '#'}
-										target={button.isExternal ? '_blank' : undefined}
-										rel={button.isExternal ? 'noopener noreferrer' : undefined}
+										{...buttonLinkAttrs(button)}
 										class={buttonClass}
 									>
 										{button.label}
@@ -129,9 +126,7 @@ const buttonClass =
 					{description && <p class="text-muted-foreground">{description}</p>}
 					{button?.label && (
 						<a
-							href={button.url ?? '#'}
-							target={button.isExternal ? '_blank' : undefined}
-							rel={button.isExternal ? 'noopener noreferrer' : undefined}
+							{...buttonLinkAttrs(button)}
 							class={buttonClass}
 						>
 							{button.label}

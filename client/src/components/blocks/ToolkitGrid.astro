@@ -1,5 +1,6 @@
 ---
 import type { ToolkitGridBlock } from '../../types/blocks';
+import { buttonLinkAttrs } from '../../lib/links';
 
 type Props = ToolkitGridBlock;
 
@@ -42,9 +43,7 @@ const toolList = tools ?? [];
 		ctaButton?.label && (
 			<a
 				data-reveal
-				href={ctaButton.url ?? '#'}
-				target={ctaButton.isExternal ? '_blank' : undefined}
-				rel={ctaButton.isExternal ? 'noopener noreferrer' : undefined}
+				{...buttonLinkAttrs(ctaButton)}
 				class="group mt-10 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20 active:scale-95"
 			>
 				{ctaButton.label}

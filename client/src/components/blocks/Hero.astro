@@ -1,5 +1,6 @@
 ---
 import type { HeroBlock } from '../../types/blocks';
+import { buttonLinkAttrs } from '../../lib/links';
 import { mediaUrl } from '../../lib/strapi';
 
 type Props = HeroBlock;
@@ -53,9 +54,7 @@ const buttonList = buttons ?? [];
 					<div data-reveal style="--reveal-delay: 160ms" class="flex flex-wrap items-center gap-4 pt-2">
 						{buttonList.map((button, i) => (
 							<a
-								href={button.url ?? '#'}
-								target={button.isExternal ? '_blank' : undefined}
-								rel={button.isExternal ? 'noopener noreferrer' : undefined}
+								{...buttonLinkAttrs(button)}
 								class:list={[
 									'group inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-95',
 									i === 0
