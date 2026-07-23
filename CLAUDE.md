@@ -54,6 +54,7 @@ When generating or modifying backend code, adhere to the following Strapi 5 stan
 ```
 
 
+
 ## Git & Deployment Workflow
 When asked to implement a new feature, fix a bug, or modify the codebase, strictly adhere to the following workflow:
 1. **Branching:** Do not commit directly to the `main` branch. Always create and switch to a new feature branch first (e.g., `git checkout -b feature/name-of-feature`).
